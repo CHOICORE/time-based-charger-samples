@@ -29,9 +29,10 @@ class Timeline {
     }
 
     fun addSlot(slot: TimeSlot) {
-        if (this.isOverlappingWithExistingSlots(slot)) {
-            throw IllegalArgumentException("The specified time slot overlaps with an existing time slot.")
+        check(!this.isOverlappingWithExistingSlots(slot)) {
+            "The specified time slot overlaps with an existing time slot."
         }
+
         this._slots.add(slot)
     }
 

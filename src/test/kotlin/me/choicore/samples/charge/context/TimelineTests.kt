@@ -63,7 +63,7 @@ class TimelineTests {
 
         assertThatThrownBy {
             timeline.addSlot(LocalTime.of(16, 59), LocalTime.of(19, 0))
-        }.isInstanceOf(IllegalArgumentException::class.java)
+        }.isInstanceOf(IllegalStateException::class.java)
     }
 
     @Test
