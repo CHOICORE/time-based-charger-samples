@@ -47,7 +47,7 @@ class TimeSlotTests {
     @Test
     fun `should return extracted time slot within the specified range`() {
         val timeSlot = TimeSlot(LocalTime.of(9, 0), LocalTime.of(15, 0))
-        val extractedTimeSlot = timeSlot.extractWithin(LocalTime.of(10, 0), LocalTime.of(14, 0))
+        val extractedTimeSlot: TimeSlot? = timeSlot.extractWithin(LocalTime.of(10, 0), LocalTime.of(14, 0))
         assertThat(extractedTimeSlot).isNotNull
         assertThat(extractedTimeSlot?.startTimeInclusive).isEqualTo(LocalTime.of(10, 0))
         assertThat(extractedTimeSlot?.endTimeInclusive).isEqualTo(LocalTime.of(14, 0))
@@ -56,7 +56,7 @@ class TimeSlotTests {
     @Test
     fun `should return null when extracting time slot within the specified range`() {
         val timeSlot = TimeSlot(LocalTime.of(9, 0), LocalTime.of(15, 0))
-        val extractedTimeSlot = timeSlot.extractWithin(LocalTime.of(8, 0), LocalTime.of(9, 0))
+        val extractedTimeSlot: TimeSlot? = timeSlot.extractWithin(LocalTime.of(8, 0), LocalTime.of(9, 0))
         assertThat(extractedTimeSlot).isNull()
     }
 
