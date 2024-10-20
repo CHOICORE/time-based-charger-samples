@@ -41,27 +41,16 @@ class Timeline {
     fun overlapsWith(other: Timeline): Boolean {
         if (!isSameDay(other)) return false
 
-        return this._slots.any { slot ->
-            val position: Int = getExistingTimeSlotPosition(other, slot)
-
-            val overlapsWithPrevious = position > 0 && other._slots[position - 1].overlapsWith(slot)
-            val overlapsWithCurrent = position < other._slots.size && other._slots[position].overlapsWith(slot)
-            val overlapsWithNext = position + 1 < other._slots.size && other._slots[position + 1].overlapsWith(slot)
-
-            overlapsWithPrevious || overlapsWithCurrent || overlapsWithNext
-        }
+        return other._slots.any(this::isOverlappingWithExistingTimeSlots)
     }
 
-    private fun isSameDay(other: Timeline): Boolean = specifiedDate?.isEqual(other.specifiedDate) ?: (dayOfWeek == other.dayOfWeek)
+    private fun isSameDay(other: Timeline): Boolean =
+        this.specifiedDate?.isEqual(other.specifiedDate) ?: (this.dayOfWeek == other.dayOfWeek)
 
-    /**
-     * 새로운 TimeSlot이 기존의 슬롯들과 겹치는지 확인합니다.
-     *
-     * @param other 추가할 새로운 시간 슬롯.
-     * @return 새로운 슬롯이 기존 슬롯들과 겹치는 경우 true, 그렇지 않으면 false.
-     */
     private fun isOverlappingWithExistingTimeSlots(other: TimeSlot): Boolean {
-        val position: Int = getExistingTimeSlotPosition(this, other)
+        // 새로운 슬롯이 들어갈 위치를 찾음
+        val position: Int = determineTimeSlotPosition(timeline = this, timeSlot = other)
+
         // 이전 슬롯과 겹치는지 확인
         val overlapWithPrevious: Boolean =
             position > 0 && this._slots[position - 1].endTimeInclusive > other.startTimeInclusive
@@ -73,12 +62,12 @@ class Timeline {
         return overlapWithPrevious || overlapWithNext
     }
 
-    private fun getExistingTimeSlotPosition(
-        other: Timeline,
-        slot: TimeSlot,
+    private fun determineTimeSlotPosition(
+        timeline: Timeline,
+        timeSlot: TimeSlot,
     ): Int =
-        other._slots
-            .binarySearch { it.startTimeInclusive.compareTo(slot.startTimeInclusive) }
+        timeline._slots
+            .binarySearch { it.startTimeInclusive.compareTo(timeSlot.startTimeInclusive) }
             .let { if (it < 0) -(it + 1) else it }
 
     override fun equals(other: Any?): Boolean {
