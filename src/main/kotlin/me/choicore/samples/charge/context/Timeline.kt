@@ -57,7 +57,7 @@ class Timeline {
 
         // 다음 슬롯과 겹치는지 확인
         val overlapWithNext: Boolean =
-            position < this._slots.size && _slots[position].startTimeInclusive < other.endTimeInclusive
+            position < this._slots.size && this._slots[position].startTimeInclusive < other.endTimeInclusive
 
         return overlapWithPrevious || overlapWithNext
     }

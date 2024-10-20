@@ -47,7 +47,7 @@ class ScenarioTests {
             )
 
         for (registry: ChargingStrategyRegistry in registries) {
-            val strategies: List<ChargingStrategy> = registry.getChargingStrategies(specifyDate.plusWeeks(1))
+            val strategies: List<ChargingStrategy> = registry.getChargingStrategies(date = specifyDate.plusWeeks(1))
             if (strategies.isNotEmpty()) {
                 assertThat(strategies.first()).isEqualTo(surchargeStrategy)
                 return
