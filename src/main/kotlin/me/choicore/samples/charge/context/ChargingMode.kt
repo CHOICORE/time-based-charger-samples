@@ -1,7 +1,7 @@
 package me.choicore.samples.charge.context
 
-enum class ChargingStrategy {
-    NOOP {
+enum class ChargingMode {
+    STANDARD {
         override fun charge(
             amount: Long,
             rate: Int,

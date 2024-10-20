@@ -3,19 +3,19 @@ package me.choicore.samples.charge.context
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-class ChargingStrategyTests {
+class ChargingModeTests {
     @Test
     fun `should return the same amount when charging with noop strategy`() {
-        val noop = ChargingStrategy.NOOP
+        val standard = ChargingMode.STANDARD
         val minutes = 1000L
         val rate = 10
-        val charged: Double = noop.charge(minutes, rate)
+        val charged: Double = standard.charge(minutes, rate)
         Assertions.assertThat(charged).isEqualTo(1000.0)
     }
 
     @Test
     fun `should return the surcharge amount when charging with surcharge strategy`() {
-        val surcharge = ChargingStrategy.SURCHARGE
+        val surcharge = ChargingMode.SURCHARGE
         val minutes = 1000L
         val rate = 10
         val charged: Double = surcharge.charge(minutes, rate)
@@ -24,7 +24,7 @@ class ChargingStrategyTests {
 
     @Test
     fun `should return the discharge amount when charging with discharge strategy`() {
-        val discharge = ChargingStrategy.DISCHARGE
+        val discharge = ChargingMode.DISCHARGE
         val minutes = 1000L
         val rate = 10
         val charged: Double = discharge.charge(minutes, rate)
