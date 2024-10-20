@@ -41,10 +41,8 @@ data class TimeSlot(
         if (this.isFullTime()) {
             return TimeSlot(startTimeInclusive, endTimeInclusive)
         } else {
-            val start =
-                if (this.startTimeInclusive.isAfter(startTimeInclusive)) this.startTimeInclusive else startTimeInclusive
-            val end =
-                if (this.endTimeInclusive.isBefore(endTimeInclusive)) this.endTimeInclusive else endTimeInclusive
+            val start: LocalTime = maxOf(this.startTimeInclusive, startTimeInclusive)
+            val end: LocalTime = minOf(this.endTimeInclusive, endTimeInclusive)
             return if (start.isBefore(end)) TimeSlot(start, end) else null
         }
     }
