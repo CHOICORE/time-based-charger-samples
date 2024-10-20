@@ -1,7 +1,7 @@
 package me.choicore.samples.charge.context
 
 import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek.SUNDAY
 import java.time.LocalDate
@@ -25,8 +25,10 @@ class ScenarioTests {
                 this.register(surchargeStrategy)
             }
 
+        val specifyDate: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(SUNDAY))
+
         val discountTimeline: Timeline =
-            Timeline(LocalDate.now().with(TemporalAdjusters.previousOrSame(SUNDAY))).apply {
+            Timeline(specifyDate).apply {
                 this.addSlot(LocalTime.of(10, 0), LocalTime.of(12, 0))
                 this.addSlot(LocalTime.of(14, 0), LocalTime.of(16, 0))
             }
@@ -45,9 +47,9 @@ class ScenarioTests {
             )
 
         for (registry: ChargingStrategyRegistry in registries) {
-            val strategies: List<ChargingStrategy> = registry.getChargingStrategies(LocalDate.now().plusWeeks(1))
+            val strategies: List<ChargingStrategy> = registry.getChargingStrategies(specifyDate.plusWeeks(1))
             if (strategies.isNotEmpty()) {
-                Assertions.assertThat(strategies.first()).isEqualTo(surchargeStrategy)
+                assertThat(strategies.first()).isEqualTo(surchargeStrategy)
                 return
             }
         }
