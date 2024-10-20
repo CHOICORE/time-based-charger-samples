@@ -49,8 +49,6 @@ class DayOfWeekChargingStrategyRegistryTests {
         // when
         val unregisteredDays: Set<DayOfWeek> = EnumSet.allOf(DayOfWeek::class.java).apply { remove(dayOfWeek) }
 
-        println(unregisteredDays)
-
         unregisteredDays.forEach { day ->
             val date: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(day))
             val result: List<ChargingStrategy> = registry.getChargingStrategies(date)

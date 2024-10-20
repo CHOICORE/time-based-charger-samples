@@ -189,7 +189,6 @@ class TimelineTests {
     fun `should new timeline with full time slot for specified date `() {
         val specifiedDate: LocalDate = LocalDate.of(2024, 10, 18)
         val timeline: Timeline = Timeline.fullTime(specifiedDate)
-        println(timeline.slots.size)
         assertThat(timeline.slots).hasSize(1)
         assertThat(timeline.slots[0].startTimeInclusive).isEqualTo(LocalTime.MIN)
         assertThat(timeline.slots[0].endTimeInclusive).isEqualTo(LocalTime.MAX)
@@ -199,7 +198,6 @@ class TimelineTests {
     fun `should new timeline with full time slot for the day of the week`() {
         val dayOfWeek: DayOfWeek = DayOfWeek.FRIDAY
         val timeline: Timeline = Timeline.fullTime(dayOfWeek)
-        println(timeline.slots.size)
         assertThat(timeline.slots).hasSize(1)
         assertThat(timeline.slots[0].startTimeInclusive).isEqualTo(LocalTime.MIN)
         assertThat(timeline.slots[0].endTimeInclusive).isEqualTo(LocalTime.MAX)
