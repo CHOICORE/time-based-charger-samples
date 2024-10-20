@@ -1,6 +1,6 @@
 package me.choicore.samples.charge.context
 
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class ChargingModeTests {
@@ -9,8 +9,8 @@ class ChargingModeTests {
         val standard = ChargingMode.STANDARD
         val minutes = 1000L
         val rate = 10
-        val charged: Double = standard.charge(minutes, rate)
-        Assertions.assertThat(charged).isEqualTo(1000.0)
+        val charged: Double = standard.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualTo(1000.0)
     }
 
     @Test
@@ -18,8 +18,8 @@ class ChargingModeTests {
         val surcharge = ChargingMode.SURCHARGE
         val minutes = 1000L
         val rate = 10
-        val charged: Double = surcharge.charge(minutes, rate)
-        Assertions.assertThat(charged).isEqualTo(1100.0)
+        val charged: Double = surcharge.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualTo(1100.0)
     }
 
     @Test
@@ -27,7 +27,7 @@ class ChargingModeTests {
         val discharge = ChargingMode.DISCHARGE
         val minutes = 1000L
         val rate = 10
-        val charged: Double = discharge.charge(minutes, rate)
-        Assertions.assertThat(charged).isEqualTo(900.0)
+        val charged: Double = discharge.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualTo(900.0)
     }
 }
