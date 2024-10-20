@@ -30,7 +30,7 @@ class Timeline {
     }
 
     fun addSlot(slot: TimeSlot) {
-        check(!this.isOverlappingWithExistingSlots(slot)) {
+        check(!this.isOverlappingWithExistingTimeSlots(slot)) {
             "The specified time slot overlaps with an existing time slot."
         }
 
@@ -42,7 +42,7 @@ class Timeline {
         if (!isSameDay(other)) return false
 
         return this._slots.any { slot ->
-            val position: Int = getPosition(other, slot)
+            val position: Int = getExistingTimeSlotPosition(other, slot)
 
             val overlapsWithPrevious = position > 0 && other._slots[position - 1].overlapsWith(slot)
             val overlapsWithCurrent = position < other._slots.size && other._slots[position].overlapsWith(slot)
@@ -57,29 +57,51 @@ class Timeline {
     /**
      * 새로운 TimeSlot이 기존의 슬롯들과 겹치는지 확인합니다.
      *
-     * @param newSlot 추가할 새로운 시간 슬롯.
+     * @param other 추가할 새로운 시간 슬롯.
      * @return 새로운 슬롯이 기존 슬롯들과 겹치는 경우 true, 그렇지 않으면 false.
      */
-    private fun isOverlappingWithExistingSlots(newSlot: TimeSlot): Boolean {
-        val position: Int = getPosition(this, newSlot)
+    private fun isOverlappingWithExistingTimeSlots(other: TimeSlot): Boolean {
+        val position: Int = getExistingTimeSlotPosition(this, other)
         // 이전 슬롯과 겹치는지 확인
         val overlapWithPrevious: Boolean =
-            position > 0 && this._slots[position - 1].endTimeInclusive > newSlot.startTimeInclusive
+            position > 0 && this._slots[position - 1].endTimeInclusive > other.startTimeInclusive
 
         // 다음 슬롯과 겹치는지 확인
         val overlapWithNext: Boolean =
-            position < this._slots.size && _slots[position].startTimeInclusive < newSlot.endTimeInclusive
+            position < this._slots.size && _slots[position].startTimeInclusive < other.endTimeInclusive
 
         return overlapWithPrevious || overlapWithNext
     }
 
-    private fun getPosition(
+    private fun getExistingTimeSlotPosition(
         other: Timeline,
         slot: TimeSlot,
     ): Int =
         other._slots
             .binarySearch { it.startTimeInclusive.compareTo(slot.startTimeInclusive) }
             .let { if (it < 0) -(it + 1) else it }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (this.javaClass != other?.javaClass) return false
+
+        other as Timeline
+
+        if (this.dayOfWeek != other.dayOfWeek) return false
+        if (this.specifiedDate != other.specifiedDate) return false
+        if (this._slots != other._slots) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = this.dayOfWeek.hashCode()
+        result = 31 * result + (this.specifiedDate?.hashCode() ?: 0)
+        result = 31 * result + this._slots.hashCode()
+        return result
+    }
+
+    override fun toString(): String = "Timeline(dayOfWeek=${this.dayOfWeek}, specifiedDate=${this.specifiedDate}, slots=${this._slots})"
 
     companion object {
         fun fullTime(date: LocalDate): Timeline = Timeline(date).apply { this.addSlot(LocalTime.MIN, LocalTime.MAX) }
