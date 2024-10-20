@@ -11,21 +11,21 @@ import java.time.LocalTime
 class TimelineTests {
     @Test
     fun `should return true if the timeline is satisfied by the specified date`() {
-        val timeline: Timeline = Timeline(LocalDate.of(2024, 1, 1))
+        val timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 1)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
     fun `should return false if the timeline is not satisfied by the specified date`() {
-        val timeline: Timeline = Timeline(LocalDate.of(2024, 1, 1))
+        val timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 2)
         assertThat(timeline.satisfiedBy(date)).isFalse
     }
 
     @Test
     fun `should return false if the timeline is not satisfied by the day of the week`() {
-        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 17)
         assertThat(date.dayOfWeek).isNotEqualTo(timeline.dayOfWeek)
         assertThat(timeline.satisfiedBy(date)).isFalse
@@ -33,14 +33,14 @@ class TimelineTests {
 
     @Test
     fun `should return true if the timeline is satisfied by the day of the week`() {
-        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 18)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
     fun `should return false if the timeline is satisfied by the day of the week, but the specified date is not`() {
-        val timeline: Timeline = Timeline(LocalDate.of(2024, 10, 18))
+        val timeline = Timeline(LocalDate.of(2024, 10, 18))
         val date: LocalDate = LocalDate.of(2024, 10, 11)
         assertThat(timeline.dayOfWeek).isEqualTo(date.dayOfWeek)
         assertThat(timeline.satisfiedBy(date)).isFalse
@@ -48,7 +48,7 @@ class TimelineTests {
 
     @Test
     fun `should add a new time slot without throwing an exception`() {
-        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline = Timeline(DayOfWeek.FRIDAY)
         timeline.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
 
         assertThatNoException().isThrownBy {
