@@ -11,21 +11,21 @@ import java.time.LocalTime
 class TimelineTests {
     @Test
     fun `should return true if the timeline is satisfied by the specified date`() {
-        val timeline = Timeline(LocalDate.of(2024, 1, 1))
+        val timeline: Timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 1)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
     fun `should return false if the timeline is not satisfied by the specified date`() {
-        val timeline = Timeline(LocalDate.of(2024, 1, 1))
+        val timeline: Timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 2)
         assertThat(timeline.satisfiedBy(date)).isFalse
     }
 
     @Test
     fun `should return false if the timeline is not satisfied by the day of the week`() {
-        val timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 17)
         assertThat(date.dayOfWeek).isNotEqualTo(timeline.dayOfWeek)
         assertThat(timeline.satisfiedBy(date)).isFalse
@@ -33,14 +33,14 @@ class TimelineTests {
 
     @Test
     fun `should return true if the timeline is satisfied by the day of the week`() {
-        val timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 18)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
     fun `should return false if the timeline is satisfied by the day of the week, but the specified date is not`() {
-        val timeline = Timeline(LocalDate.of(2024, 10, 18))
+        val timeline: Timeline = Timeline(LocalDate.of(2024, 10, 18))
         val date: LocalDate = LocalDate.of(2024, 10, 11)
         assertThat(timeline.dayOfWeek).isEqualTo(date.dayOfWeek)
         assertThat(timeline.satisfiedBy(date)).isFalse
@@ -48,7 +48,7 @@ class TimelineTests {
 
     @Test
     fun `should add a new time slot without throwing an exception`() {
-        val timeline = Timeline(DayOfWeek.FRIDAY)
+        val timeline: Timeline = Timeline(DayOfWeek.FRIDAY)
         timeline.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
 
         assertThatNoException().isThrownBy {
@@ -58,8 +58,11 @@ class TimelineTests {
 
     @Test
     fun `should throw an exception when adding overlapping time slot`() {
-        val timeline = Timeline(LocalDate.of(2024, 10, 18))
-        timeline.addSlot(TimeSlot(LocalTime.of(9, 0), LocalTime.of(17, 0)))
+        val timeline: Timeline =
+            Timeline(LocalDate.of(2024, 10, 18))
+                .apply {
+                    this.addSlot(TimeSlot(LocalTime.of(9, 0), LocalTime.of(17, 0)))
+                }
 
         assertThatThrownBy {
             timeline.addSlot(LocalTime.of(16, 59), LocalTime.of(19, 0))
@@ -67,44 +70,119 @@ class TimelineTests {
     }
 
     @Test
-    fun `should return false if timeline do not have overlapping time slots with another timeline`() {
-        val timeline = Timeline(LocalDate.of(2024, 10, 18))
-        timeline.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
+    fun `should not overlap when timelines have no overlapping slots`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
 
-        val other = Timeline(LocalDate.of(2024, 10, 18))
-        other.addSlot(LocalTime.of(17, 0), LocalTime.of(19, 0))
+        val other: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(11, 0), LocalTime.of(12, 0))
+            }
 
-        assertThat(timeline.overlapsTimeSlotWith(other)).isFalse
-        assertThat(other.overlapsTimeSlotWith(timeline)).isFalse
+        assertThat(timeline.overlapsWith(other)).isFalse
+        assertThat(other.overlapsWith(timeline)).isFalse
     }
 
     @Test
-    fun `should return true if timeline have overlapping time slots with another timeline`() {
-        val specifiedDate: LocalDate = LocalDate.of(2024, 10, 18)
+    fun `should overlap when timeline's previous slot overlaps`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(10, 0), LocalTime.of(11, 0))
+            }
 
-        val timeline = Timeline(specifiedDate)
-        timeline.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
+        val other: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 30), LocalTime.of(10, 30))
+            }
 
-        val other = Timeline(specifiedDate)
-        other.addSlot(LocalTime.of(16, 0), LocalTime.of(19, 0))
-
-        assertThat(timeline.overlapsTimeSlotWith(other)).isTrue
-        assertThat(other.overlapsTimeSlotWith(timeline)).isTrue
+        assertThat(timeline.overlapsWith(other)).isTrue
+        assertThat(other.overlapsWith(timeline)).isTrue
     }
 
     @Test
-    fun `should return true if timeline have overlapping time slots with another timeline with multiple slots`() {
-        val specifiedDate: LocalDate = LocalDate.of(2024, 10, 18)
+    fun `should overlap when timeline's current slot overlaps`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
 
-        val timeline = Timeline(specifiedDate)
-        timeline.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
-        timeline.addSlot(LocalTime.of(18, 0), LocalTime.of(19, 0))
+        val other: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 30), LocalTime.of(10, 30))
+            }
 
-        val other = Timeline(specifiedDate)
-        other.addSlot(LocalTime.of(16, 0), LocalTime.of(19, 0))
+        assertThat(timeline.overlapsWith(other)).isTrue
+        assertThat(other.overlapsWith(timeline)).isTrue
+    }
 
-        assertThat(timeline.overlapsTimeSlotWith(other)).isTrue
-        assertThat(other.overlapsTimeSlotWith(timeline)).isTrue
+    @Test
+    fun `should overlap when timeline's next slot overlaps`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
+
+        val other: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(10, 0), LocalTime.of(11, 0))
+            }
+
+        assertThat(timeline.overlapsWith(other)).isFalse
+        assertThat(other.overlapsWith(timeline)).isFalse
+    }
+
+    @Test
+    fun `should handle multiple slots with some overlapping and some not`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(8, 0), LocalTime.of(9, 0))
+                this.addSlot(LocalTime.of(11, 0), LocalTime.of(12, 0))
+            }
+
+        val other: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+                this.addSlot(LocalTime.of(10, 30), LocalTime.of(11, 30))
+            }
+
+        assertThat(timeline.overlapsWith(other)).isTrue
+        assertThat(other.overlapsWith(timeline)).isTrue
+    }
+
+    @Test
+    fun `should not overlap when timelines are on different days`() {
+        val timeline: Timeline =
+            Timeline(DayOfWeek.MONDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
+
+        val other: Timeline =
+            Timeline(DayOfWeek.TUESDAY).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
+
+        assertThat(timeline.overlapsWith(other)).isFalse
+        assertThat(other.overlapsWith(timeline)).isFalse
+    }
+
+    @Test
+    fun `should overlap when timelines have the same specified date`() {
+        val date: LocalDate = LocalDate.of(2024, 10, 20)
+
+        val timeline: Timeline =
+            Timeline(date).apply {
+                this.addSlot(LocalTime.of(9, 0), LocalTime.of(10, 0))
+            }
+
+        val other: Timeline =
+            Timeline(date).apply {
+                this.addSlot(LocalTime.of(9, 30), LocalTime.of(10, 30))
+            }
+
+        assertThat(timeline.overlapsWith(other)).isTrue
+        assertThat(other.overlapsWith(timeline)).isTrue
     }
 
     @Test
