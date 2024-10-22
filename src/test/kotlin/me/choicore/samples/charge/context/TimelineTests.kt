@@ -10,21 +10,21 @@ import java.time.LocalTime
 
 class TimelineTests {
     @Test
-    fun `should return true if the timeline is satisfied by the specified date`() {
+    fun `should return true when timeline is satisfied by the specified date`() {
         val timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 1)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
-    fun `should return false if the timeline is not satisfied by the specified date`() {
+    fun `should return false when timeline is not satisfied by the specified date`() {
         val timeline = Timeline(LocalDate.of(2024, 1, 1))
         val date: LocalDate = LocalDate.of(2024, 1, 2)
         assertThat(timeline.satisfiedBy(date)).isFalse
     }
 
     @Test
-    fun `should return false if the timeline is not satisfied by the day of the week`() {
+    fun `should return false when timeline is not satisfied by the day of the week`() {
         val timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 17)
         assertThat(date.dayOfWeek).isNotEqualTo(timeline.dayOfWeek)
@@ -32,14 +32,14 @@ class TimelineTests {
     }
 
     @Test
-    fun `should return true if the timeline is satisfied by the day of the week`() {
+    fun `should return true when timeline is satisfied by the day of the week`() {
         val timeline = Timeline(DayOfWeek.FRIDAY)
         val date: LocalDate = LocalDate.of(2024, 10, 18)
         assertThat(timeline.satisfiedBy(date)).isTrue
     }
 
     @Test
-    fun `should return false if the timeline is satisfied by the day of the week, but the specified date is not`() {
+    fun `should return false when timeline is satisfied by the day of the week, but the specified date is not`() {
         val timeline = Timeline(LocalDate.of(2024, 10, 18))
         val date: LocalDate = LocalDate.of(2024, 10, 11)
         assertThat(timeline.dayOfWeek).isEqualTo(date.dayOfWeek)
@@ -201,5 +201,79 @@ class TimelineTests {
         assertThat(timeline.slots).hasSize(1)
         assertThat(timeline.slots[0].startTimeInclusive).isEqualTo(LocalTime.MIN)
         assertThat(timeline.slots[0].endTimeInclusive).isEqualTo(LocalTime.MAX)
+    }
+
+    @Test
+    fun `should filtered timeline when time range within timeline`() {
+        val timeline: Timeline =
+            Timeline(LocalDate.of(2024, 10, 18))
+                .apply {
+                    this.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
+                }
+
+        val applied: Timeline =
+            timeline.determine(
+                LocalDate.of(2024, 10, 18),
+                LocalTime.of(10, 0),
+                LocalTime.of(16, 0),
+            )
+
+        assertThat(applied.slots).hasSize(1)
+        assertThat(applied.slots[0].startTimeInclusive).isEqualTo(LocalTime.of(10, 0))
+        assertThat(applied.slots[0].endTimeInclusive).isEqualTo(LocalTime.of(16, 0))
+    }
+
+    @Test
+    fun `should filtered timeline when time range out of timeline`() {
+        val timeline: Timeline =
+            Timeline(LocalDate.of(2024, 10, 18))
+                .apply {
+                    this.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
+                }
+
+        val applied: Timeline =
+            timeline.determine(
+                LocalDate.of(2024, 10, 18),
+                LocalTime.of(8, 0),
+                LocalTime.of(9, 0),
+            )
+
+        assertThat(applied.slots).isEmpty()
+    }
+
+    @Test
+    fun `should filtered timeline when time range partially within timeline`() {
+        val timeline: Timeline =
+            Timeline(LocalDate.of(2024, 10, 18))
+                .apply {
+                    this.addSlot(LocalTime.of(9, 0), LocalTime.of(17, 0))
+                }
+
+        val applied: Timeline =
+            timeline.determine(
+                LocalDate.of(2024, 10, 18),
+                LocalTime.of(8, 0),
+                LocalTime.of(10, 0),
+            )
+
+        assertThat(applied.slots).hasSize(1)
+        assertThat(applied.slots[0].startTimeInclusive).isEqualTo(LocalTime.of(9, 0))
+        assertThat(applied.slots[0].endTimeInclusive).isEqualTo(LocalTime.of(10, 0))
+    }
+
+    @Test
+    fun `should return true when time slot is absent`() {
+        val timeline: Timeline =
+            Timeline(LocalDate.of(2024, 10, 18))
+                .apply {
+                    this.addSlot(TimeSlot(LocalTime.of(9, 0), LocalTime.of(17, 0)))
+                }
+        assertThat(timeline.hasSlots()).isTrue
+    }
+
+    @Test
+    fun `should return false when time slot is not added`() {
+        val timeline = Timeline(LocalDate.of(2024, 10, 18))
+        assertThat(timeline.hasSlots()).isFalse
     }
 }
