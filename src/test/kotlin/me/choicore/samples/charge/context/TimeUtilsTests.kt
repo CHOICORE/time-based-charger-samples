@@ -41,4 +41,16 @@ class TimeUtilsTests {
 
         assertThat(duration).isEqualTo(24)
     }
+
+    @Test
+    fun `should adjust duration from 00_00_00 to 23_59_59_999999999 as 1 days`() {
+        val duration: Long =
+            TimeUtils.duration(
+                start = LocalTime.MIN,
+                end = LocalTime.MAX,
+                unit = ChronoUnit.DAYS,
+            )
+
+        assertThat(duration).isEqualTo(1)
+    }
 }
