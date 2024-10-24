@@ -22,22 +22,6 @@ class Timeline {
 
     fun satisfiedBy(date: LocalDate): Boolean = this.specifiedDate?.isEqual(date) ?: (this.dayOfWeek == date.dayOfWeek)
 
-    fun hasSlots(): Boolean = this._slots.isNotEmpty()
-
-    fun determine(
-        date: LocalDate,
-        startTimeInclusive: LocalTime,
-        endTimeInclusive: LocalTime,
-    ): Timeline {
-        val timeline = Timeline(date)
-
-        this._slots.forEach { slot: TimeSlot ->
-            slot.extractWithin(startTimeInclusive, endTimeInclusive)?.let { timeline.addSlot(it) }
-        }
-
-        return timeline
-    }
-
     fun addSlot(
         startTimeInclusive: LocalTime,
         endTimeInclusive: LocalTime,

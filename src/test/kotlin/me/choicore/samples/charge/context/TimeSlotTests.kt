@@ -4,7 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import org.assertj.core.api.Assertions.assertThatNoException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 class TimeSlotTests {
     @Test
@@ -64,5 +67,21 @@ class TimeSlotTests {
     fun `should return true if the time slot is full time`() {
         val timeSlot = TimeSlot(LocalTime.MIN, LocalTime.MAX)
         assertThat(timeSlot.isFullTime()).isTrue
+    }
+
+    @ParameterizedTest
+    @EnumSource(names = ["HOURS", "MINUTES", "SECONDS"])
+    fun `should calculate the duration in specified unit`(unit: ChronoUnit) {
+        val startTimeInclusive: LocalTime = LocalTime.of(9, 0)
+        val endTimeInclusive: LocalTime = LocalTime.of(15, 0)
+        val timeSlot = TimeSlot(startTimeInclusive, endTimeInclusive)
+
+        assertThat(timeSlot.duration(unit = unit)).isEqualTo(
+            TimeUtils.duration(
+                start = startTimeInclusive,
+                end = endTimeInclusive,
+                unit = unit,
+            ),
+        )
     }
 }

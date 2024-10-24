@@ -1,6 +1,7 @@
 package me.choicore.samples.charge.context
 
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 /**
  * `TimeSlot` 클래스는 시작 시간과 종료 시간을 포함하는 시간 구간을 표현합니다.
@@ -18,6 +19,13 @@ data class TimeSlot(
             "startTimeInclusive must be before endTimeInclusive"
         }
     }
+
+    fun duration(unit: ChronoUnit): Long =
+        TimeUtils.duration(
+            start = this.startTimeInclusive,
+            end = this.endTimeInclusive,
+            unit = unit,
+        )
 
     /**
      * 주어진 다른 `TimeSlot`과 이 `TimeSlot`이 겹치는지 여부를 확인합니다.
