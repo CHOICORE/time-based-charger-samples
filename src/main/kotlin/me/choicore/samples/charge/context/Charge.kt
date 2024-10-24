@@ -9,6 +9,10 @@ data class Charge(
     val start: LocalTime,
     val end: LocalTime,
 ) {
+    init {
+        require(this.start.isBefore(this.end)) { "The start time must be before the end time." }
+    }
+
     private val _adjustments: MutableList<Adjustment> = mutableListOf()
     val adjustments: List<Adjustment> get() = this._adjustments.toList()
     val amount: Long
