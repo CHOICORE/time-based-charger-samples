@@ -31,6 +31,12 @@ data class Charge(
         applied: TimeSlot,
         basis: TimeSlot,
     ) {
+        this._adjustments.forEach { exists ->
+            require(!basis.overlapsWith(exists.basis)) {
+                "New basis time slot overlaps with existing adjustment: existing(${exists.basis.startTimeInclusive}-${exists.basis.endTimeInclusive})"
+            }
+        }
+
         this._adjustments.add(Adjustment(mode = mode, rate = rate, basis = basis, applied = applied))
     }
 

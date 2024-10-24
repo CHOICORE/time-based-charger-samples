@@ -1,6 +1,8 @@
 package me.choicore.samples.charge.context
 
+import me.choicore.samples.charge.context.Charge.Adjustment
 import me.choicore.samples.charge.context.ChargingMode.DISCHARGE
+import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import java.time.LocalDate
@@ -54,15 +56,12 @@ class ChargeTests {
 
         // then
         assertThat(charge.adjustments).hasSize(1)
-        val adjustment = charge.adjustments[0]
+        val adjustment: Adjustment = charge.adjustments[0]
         assertThat(adjustment.mode).isEqualTo(DISCHARGE)
         assertThat(adjustment.rate).isEqualTo(10)
         assertThat(adjustment.basis).isEqualTo(basis)
         assertThat(adjustment.applied).isEqualTo(applied)
-
-        // amount(540) - basis duration(540) + adjustment amount
-        val expectedAmount = adjustment.amount
-        assertThat(charge.amount).isEqualTo(expectedAmount)
+        assertThat(charge.amount).isEqualTo(adjustment.amount)
     }
 
     @Test
@@ -74,5 +73,51 @@ class ChargeTests {
                 end = LocalTime.of(9, 0),
             )
         }.isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun `should calculate correct amount with multiple valid adjustments`() {
+        // given
+        val charge =
+            Charge(
+                date = LocalDate.now(),
+                start = LocalTime.of(9, 0),
+                end = LocalTime.of(18, 0),
+            )
+
+        // when
+        charge.adjust(
+            mode = SURCHARGE,
+            rate = 10,
+            applied =
+                TimeSlot(
+                    startTimeInclusive = LocalTime.of(9, 0),
+                    endTimeInclusive = LocalTime.of(12, 0),
+                ),
+            basis =
+                TimeSlot(
+                    startTimeInclusive = LocalTime.of(9, 0),
+                    endTimeInclusive = LocalTime.of(12, 0),
+                ),
+        )
+
+        charge.adjust(
+            mode = DISCHARGE,
+            rate = 15,
+            applied =
+                TimeSlot(
+                    startTimeInclusive = LocalTime.of(12, 0),
+                    endTimeInclusive = LocalTime.of(18, 0),
+                ),
+            basis =
+                TimeSlot(
+                    startTimeInclusive = LocalTime.of(12, 0),
+                    endTimeInclusive = LocalTime.of(20, 0),
+                ),
+        )
+
+        // then
+        assertThat(charge.adjustments).hasSize(2)
+        assertThat(charge.amount).isEqualTo(384L)
     }
 }
