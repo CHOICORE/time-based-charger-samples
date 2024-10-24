@@ -15,7 +15,7 @@ class TimeUtilsTests {
                 unit = ChronoUnit.MINUTES,
             )
 
-        assertThat(duration).isEqualTo(1_440L)
+        assertThat(duration).isEqualTo(1_440)
     }
 
     @Test
@@ -27,7 +27,7 @@ class TimeUtilsTests {
                 unit = ChronoUnit.SECONDS,
             )
 
-        assertThat(duration).isEqualTo(86400)
+        assertThat(duration).isEqualTo(86_400)
     }
 
     @Test
