@@ -20,21 +20,22 @@ class Timeline {
         this.specifiedDate = specifyDate
     }
 
-    fun satisfiedBy(date: LocalDate): Boolean = this.specifiedDate?.isEqual(date) ?: (this.dayOfWeek == date.dayOfWeek)
+    fun satisfiedBy(selectedDate: LocalDate): Boolean =
+        this.specifiedDate?.isEqual(selectedDate) ?: (this.dayOfWeek == selectedDate.dayOfWeek)
 
     fun addSlot(
         startTimeInclusive: LocalTime,
         endTimeInclusive: LocalTime,
     ) {
-        this.addSlot(TimeSlot(startTimeInclusive, endTimeInclusive))
+        this.addSlot(slot = TimeSlot(startTimeInclusive, endTimeInclusive))
     }
 
     fun addSlot(slot: TimeSlot) {
-        check(!this.isOverlappingWithExistingTimeSlots(slot)) {
+        check(!this.isOverlappingWithExistingTimeSlots(other = slot)) {
             "The specified time slot overlaps with an existing time slot."
         }
 
-        this._slots.add(slot)
+        this._slots += slot
         this._slots.sortBy { it.startTimeInclusive }
     }
 
@@ -93,8 +94,9 @@ class Timeline {
     override fun toString(): String = "Timeline(dayOfWeek=${this.dayOfWeek}, specifiedDate=${this.specifiedDate}, slots=${this._slots})"
 
     companion object {
-        fun fullTime(date: LocalDate): Timeline = Timeline(date).apply { this.addSlot(LocalTime.MIN, LocalTime.MAX) }
+        fun fullTime(specifyDate: LocalDate): Timeline =
+            Timeline(specifyDate = specifyDate).apply { this.addSlot(LocalTime.MIN, LocalTime.MAX) }
 
-        fun fullTime(dayOfWeek: DayOfWeek): Timeline = Timeline(dayOfWeek).apply { this.addSlot(LocalTime.MIN, LocalTime.MAX) }
+        fun fullTime(dayOfWeek: DayOfWeek): Timeline = Timeline(dayOfWeek = dayOfWeek).apply { this.addSlot(LocalTime.MIN, LocalTime.MAX) }
     }
 }
