@@ -15,15 +15,17 @@ class ChargingStrategyTests {
     @Test
     fun `should return true when strategy is supported for specified date`() {
         val date: LocalDate = LocalDate.now()
-        val chargingStrategy = ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(date))
-        assertThat(chargingStrategy.supports(date = date)).isTrue
+        val chargingStrategy =
+            ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(specifyDate = date))
+        assertThat(chargingStrategy.supports(selectedDate = date)).isTrue
     }
 
     @Test
     fun `should return false when strategy is not supported for specified date`() {
         val date: LocalDate = LocalDate.now()
-        val chargingStrategy = ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(date))
-        assertThat(chargingStrategy.supports(date = date.plusDays(1))).isFalse
+        val chargingStrategy =
+            ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(specifyDate = date))
+        assertThat(chargingStrategy.supports(selectedDate = date.plusDays(1))).isFalse
     }
 
     @ParameterizedTest
@@ -34,13 +36,13 @@ class ChargingStrategyTests {
             ChargingStrategy(
                 mode = SURCHARGE,
                 rate = 10,
-                timeline = Timeline.fullTime(date = date),
+                timeline = Timeline.fullTime(specifyDate = date),
             )
-        assertThat(chargingStrategy.supports(date = date)).isTrue
+        assertThat(chargingStrategy.supports(selectedDate = date)).isTrue
     }
 
     @Test
-    fun `should audit and apply charge adjustment with correct amount`() {
+    fun `should attempt and apply charge adjustment with correct amount`() {
         // given
         val charge =
             Charge(
@@ -53,11 +55,11 @@ class ChargingStrategyTests {
             ChargingStrategy(
                 mode = DISCHARGE,
                 rate = 10,
-                timeline = Timeline.fullTime(LocalDate.now()),
+                timeline = Timeline.fullTime(specifyDate = LocalDate.now()),
             )
 
         // when
-        chargingStrategy.audit(charge = charge)
+        chargingStrategy.attempt(charge = charge)
 
         // then
         assertThat(charge.adjustments).hasSize(1)

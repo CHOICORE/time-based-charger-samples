@@ -17,27 +17,32 @@ data class Charge(
     val adjustments: List<Adjustment> get() = this._adjustments.toList()
     val amount: Long
         get() {
-            var amount: Long = TimeUtils.duration(unit = MINUTES, start = this.start, end = this.end)
-            for (adjustment: Adjustment in adjustments) {
-                amount -= adjustment.basis.duration(unit = MINUTES)
-                amount += adjustment.amount
-            }
-            return amount
+            val initial: Long = TimeUtils.duration(unit = MINUTES, start = this.start, end = this.end)
+            return this._adjustments.fold(initial) { amount, adjustment -> adjustment.adjustTo(amount) }
         }
 
-    fun adjust(
-        mode: ChargingMode,
-        rate: Int,
-        applied: TimeSlot,
-        basis: TimeSlot,
-    ) {
-        this._adjustments.forEach { exists ->
-            require(!basis.overlapsWith(exists.basis)) {
-                "New basis time slot overlaps with existing adjustment: existing(${exists.basis.startTimeInclusive}-${exists.basis.endTimeInclusive})"
+    fun adjust(strategy: ChargingStrategy) {
+        require(strategy.supports(this.date)) { "The specified date does not satisfy the timeline." }
+
+        strategy.timeline.slots.forEach { slot ->
+            val basis: TimeSlot = slot
+            val applied: TimeSlot? = slot.extractWithin(this.start, this.end)
+            if (applied != null) {
+                this.addAdjustment(
+                    Adjustment(
+                        mode = strategy.mode,
+                        rate = strategy.rate,
+                        basis = basis,
+                        applied = applied,
+                    ),
+                )
             }
         }
+    }
 
-        this._adjustments.add(Adjustment(mode = mode, rate = rate, basis = basis, applied = applied))
+    private fun addAdjustment(adjustment: Adjustment) {
+        this._adjustments.add(adjustment)
+        this._adjustments.sortBy { it.basis.startTimeInclusive }
     }
 
     data class Adjustment(
@@ -47,6 +52,17 @@ data class Charge(
         val applied: TimeSlot,
     ) {
         val amount: Long =
+            mode
+                .charge(
+                    amount = applied.duration(unit = MINUTES),
+                    rate = this.rate,
+                ).toLong()
+
+        fun adjustTo(amount: Long): Long = amount - this.computeOriginalAmount() + this.computeChargedAmount()
+
+        private fun computeOriginalAmount(): Long = basis.duration(unit = MINUTES)
+
+        private fun computeChargedAmount(): Long =
             mode
                 .charge(
                     amount = applied.duration(unit = MINUTES),

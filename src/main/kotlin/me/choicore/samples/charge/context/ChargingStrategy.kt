@@ -13,23 +13,16 @@ data class ChargingStrategy(
 
     val type: Type = if (this.specifiedDate != null) Type.ONCE else Type.REPEATABLE
 
-    fun supports(date: LocalDate): Boolean = this.timeline.satisfiedBy(date = date)
+    fun supports(selectedDate: LocalDate): Boolean = this.timeline.satisfiedBy(selectedDate = selectedDate)
 
-    fun audit(charge: Charge) {
-        require(this.supports(charge.date)) { "The specified date does not satisfy the timeline." }
+    fun attempt(charge: Charge) {
+        require(value = this.supports(selectedDate = charge.date)) { "The specified date does not satisfy the timeline." }
+        charge.adjust(strategy = this)
+    }
 
-        this.timeline.slots.forEach { slot ->
-            val basis: TimeSlot = slot
-            val applied: TimeSlot? = slot.extractWithin(charge.start, charge.end)
-            if (applied != null) {
-                charge.adjust(
-                    mode = this.mode,
-                    rate = this.rate,
-                    basis = basis,
-                    applied = applied,
-                )
-            }
-        }
+    enum class Type {
+        REPEATABLE,
+        ONCE,
     }
 
     companion object {
@@ -39,10 +32,5 @@ data class ChargingStrategy(
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
-    }
-
-    enum class Type {
-        REPEATABLE,
-        ONCE,
     }
 }
