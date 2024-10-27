@@ -1,0 +1,10 @@
+services:
+  mysql:
+    image: 'mysql:lts'
+    environment:
+      - 'MYSQL_DATABASE=settlements'
+      - 'MYSQL_PASSWORD=secret'
+      - 'MYSQL_ROOT_PASSWORD=verysecret'
+      - 'MYSQL_USER=choicore'
+    ports:
+      - '3306:3306'
