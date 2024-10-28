@@ -109,4 +109,33 @@ class ChargeTests {
         assertThat(charge.adjustments).hasSize(2)
         assertThat(charge.amount).isEqualTo(570)
     }
+
+    @Test
+    fun `should calculate correct amount with single valid adjustment`() {
+        // given
+        val specifyDate: LocalDate = LocalDate.now()
+        val charge =
+            Charge(
+                date = specifyDate,
+                start = LocalTime.of(9, 0),
+                end = LocalTime.of(10, 0),
+            )
+
+        val chargingStrategy =
+            ChargingStrategy(
+                mode = SURCHARGE,
+                rate = 10,
+                timeline =
+                    Timeline(specifyDate = specifyDate).apply {
+                        this.addSlot(LocalTime.of(9, 0), LocalTime.of(12, 0))
+                    },
+            )
+
+        // when
+        charge.adjust(chargingStrategy)
+
+        // then
+        assertThat(charge.adjustments).hasSize(1)
+        assertThat(charge.amount).isEqualTo(66)
+    }
 }

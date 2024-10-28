@@ -60,7 +60,7 @@ data class Charge(
 
         fun adjustTo(amount: Long): Long = amount - this.computeOriginalAmount() + this.computeChargedAmount()
 
-        private fun computeOriginalAmount(): Long = basis.duration(unit = MINUTES)
+        private fun computeOriginalAmount(): Long = applied.duration(unit = MINUTES)
 
         private fun computeChargedAmount(): Long =
             mode
