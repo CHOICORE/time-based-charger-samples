@@ -32,5 +32,12 @@ data class ChargingStrategy(
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
+
+        fun exempt(dayOfWeek: DayOfWeek): ChargingStrategy =
+            ChargingStrategy(
+                mode = ChargingMode.DISCHARGE,
+                rate = 100,
+                timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
+            )
     }
 }
