@@ -64,6 +64,25 @@ class ChargingStrategyTests {
         // then
         assertThat(charge.adjustments).hasSize(1)
         assertThat(charge.adjustments[0].amount).isEqualTo(1296L)
-        println(charge.amount)
+    }
+
+    @Test
+    fun `should exempt charge when exempt strategy is applied`() {
+        // given
+        val charge =
+            Charge(
+                date = LocalDate.now(),
+                start = LocalTime.MIN,
+                end = LocalTime.MAX,
+            )
+
+        val chargingStrategy: ChargingStrategy = ChargingStrategy.exempt(dayOfWeek = LocalDate.now().dayOfWeek)
+
+        // when
+        chargingStrategy.attempt(charge = charge)
+
+        // then
+        assertThat(charge.adjustments).hasSize(1)
+        assertThat(charge.adjustments[0].amount).isEqualTo(0)
     }
 }
