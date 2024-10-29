@@ -44,11 +44,11 @@ class ChargingStrategyTests {
     @Test
     fun `should attempt and apply charge adjustment with correct amount`() {
         // given
-        val charge =
-            Charge(
-                date = LocalDate.now(),
-                start = LocalTime.MIN,
-                end = LocalTime.MAX,
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = LocalDate.now(),
+                startTime = LocalTime.MIN,
+                endTime = LocalTime.MAX,
             )
 
         val chargingStrategy =
@@ -59,30 +59,30 @@ class ChargingStrategyTests {
             )
 
         // when
-        chargingStrategy.attempt(charge = charge)
+        chargingStrategy.attempt(chargingUnit = chargingUnit)
 
         // then
-        assertThat(charge.adjustments).hasSize(1)
-        assertThat(charge.adjustments[0].amount).isEqualTo(1296L)
+        assertThat(chargingUnit.adjustments).hasSize(1)
+        assertThat(chargingUnit.adjustments[0].amount).isEqualTo(1296L)
     }
 
     @Test
     fun `should exempt charge when exempt strategy is applied`() {
         // given
-        val charge =
-            Charge(
-                date = LocalDate.now(),
-                start = LocalTime.MIN,
-                end = LocalTime.MAX,
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = LocalDate.now(),
+                startTime = LocalTime.MIN,
+                endTime = LocalTime.MAX,
             )
 
         val chargingStrategy: ChargingStrategy = ChargingStrategy.exempt(dayOfWeek = LocalDate.now().dayOfWeek)
 
         // when
-        chargingStrategy.attempt(charge = charge)
+        chargingStrategy.attempt(chargingUnit = chargingUnit)
 
         // then
-        assertThat(charge.adjustments).hasSize(1)
-        assertThat(charge.adjustments[0].amount).isEqualTo(0)
+        assertThat(chargingUnit.adjustments).hasSize(1)
+        assertThat(chargingUnit.adjustments[0].amount).isEqualTo(0)
     }
 }

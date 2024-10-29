@@ -65,7 +65,7 @@ class ChargingStationRegistryTests {
 
         // when
         val result: ChargingStation =
-            chargingStationRegistry.determine(specifiedDate = trialPolicyDate)
+            chargingStationRegistry.determine(chargedOn = trialPolicyDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -78,7 +78,7 @@ class ChargingStationRegistryTests {
         val startDate: LocalDate = LocalDate.of(2024, 11, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(specifiedDate = startDate)
+        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = startDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -91,7 +91,7 @@ class ChargingStationRegistryTests {
         val endDate: LocalDate = LocalDate.of(2024, 11, 30)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(specifiedDate = endDate)
+        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = endDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -104,7 +104,7 @@ class ChargingStationRegistryTests {
         val futureDate: LocalDate = LocalDate.of(2024, 12, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(specifiedDate = futureDate)
+        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = futureDate)
 
         // then
         assertThat(result.id).isEqualTo(2)
@@ -117,7 +117,7 @@ class ChargingStationRegistryTests {
         val pastDate: LocalDate = LocalDate.of(2024, 10, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(specifiedDate = pastDate)
+        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = pastDate)
 
         // then
         assertThat(result.id).isEqualTo(4)
@@ -131,7 +131,7 @@ class ChargingStationRegistryTests {
         val testDate: LocalDate = LocalDate.of(2024, 11, 15)
 
         // when/then
-        assertThatThrownBy { emptyRegistry.determine(specifiedDate = testDate) }
+        assertThatThrownBy { emptyRegistry.determine(chargedOn = testDate) }
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessageContaining("No applicable ChargingStation found")
     }
@@ -162,7 +162,7 @@ class ChargingStationRegistryTests {
             )
 
         // when
-        val result: ChargingStation = registry.determine(specifiedDate = LocalDate.of(2024, 12, 15))
+        val result: ChargingStation = registry.determine(chargedOn = LocalDate.of(2024, 12, 15))
 
         // then
         assertThat(result.id).isEqualTo(5)

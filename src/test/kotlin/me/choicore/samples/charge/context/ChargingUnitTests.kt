@@ -1,38 +1,38 @@
 package me.choicore.samples.charge.context
 
-import me.choicore.samples.charge.context.Charge.Adjustment
 import me.choicore.samples.charge.context.ChargingMode.DISCHARGE
 import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
+import me.choicore.samples.charge.context.ChargingUnit.Adjustment
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.test.Test
 
-class ChargeTests {
+class ChargingUnitTests {
     @Test
     fun `should calculate correct amount for full day charge without adjustments`() {
         // given
-        val charge =
-            Charge(
-                date = LocalDate.now(),
-                start = LocalTime.MIN,
-                end = LocalTime.MAX,
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = LocalDate.now(),
+                startTime = LocalTime.MIN,
+                endTime = LocalTime.MAX,
             )
 
         // when & then
-        assertThat(charge.amount).isEqualTo(1440L)
+        assertThat(chargingUnit.amount).isEqualTo(1440L)
     }
 
     @Test
     fun `should properly add single adjustment and calculate amount`() {
         // given
-        val specifyDate: LocalDate = LocalDate.now()
-        val charge =
-            Charge(
-                date = specifyDate,
-                start = LocalTime.of(9, 0),
-                end = LocalTime.of(18, 0),
+        val chargedOn: LocalDate = LocalDate.now()
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = chargedOn,
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(18, 0),
             )
 
         val basis =
@@ -48,34 +48,34 @@ class ChargeTests {
             )
 
         // when
-        charge.adjust(
+        chargingUnit.adjust(
             ChargingStrategy(
                 mode = DISCHARGE,
                 rate = 10,
                 timeline =
-                    Timeline(specifyDate = specifyDate).apply {
+                    Timeline(specifyDate = chargedOn).apply {
                         this.addSlot(basis)
                     },
             ),
         )
 
         // then
-        assertThat(charge.adjustments).hasSize(1)
-        val adjustment: Adjustment = charge.adjustments[0]
+        assertThat(chargingUnit.adjustments).hasSize(1)
+        val adjustment: Adjustment = chargingUnit.adjustments[0]
         assertThat(adjustment.mode).isEqualTo(DISCHARGE)
         assertThat(adjustment.rate).isEqualTo(10)
         assertThat(adjustment.basis).isEqualTo(basis)
         assertThat(adjustment.applied).isEqualTo(applied)
-        assertThat(charge.amount).isEqualTo(adjustment.amount)
+        assertThat(chargingUnit.amount).isEqualTo(adjustment.amount)
     }
 
     @Test
     fun `should throw exception for invalid time range`() {
         assertThatThrownBy {
-            Charge(
-                date = LocalDate.now(),
-                start = LocalTime.of(18, 0),
-                end = LocalTime.of(9, 0),
+            ChargingUnit(
+                chargedOn = LocalDate.now(),
+                startTime = LocalTime.of(18, 0),
+                endTime = LocalTime.of(9, 0),
             )
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
@@ -84,11 +84,11 @@ class ChargeTests {
     fun `should calculate correct amount with multiple valid adjustments`() {
         // given
         val specifyDate: LocalDate = LocalDate.now()
-        val charge =
-            Charge(
-                date = specifyDate,
-                start = LocalTime.of(9, 0),
-                end = LocalTime.of(18, 0),
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = specifyDate,
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(18, 0),
             )
 
         val chargingStrategy =
@@ -103,22 +103,22 @@ class ChargeTests {
             )
 
         // when
-        charge.adjust(chargingStrategy)
+        chargingUnit.adjust(chargingStrategy)
 
         // then
-        assertThat(charge.adjustments).hasSize(2)
-        assertThat(charge.amount).isEqualTo(570)
+        assertThat(chargingUnit.adjustments).hasSize(2)
+        assertThat(chargingUnit.amount).isEqualTo(570)
     }
 
     @Test
     fun `should calculate correct amount with single valid adjustment`() {
         // given
-        val specifyDate: LocalDate = LocalDate.now()
-        val charge =
-            Charge(
-                date = specifyDate,
-                start = LocalTime.of(9, 0),
-                end = LocalTime.of(10, 0),
+        val chargedOn: LocalDate = LocalDate.now()
+        val chargingUnit =
+            ChargingUnit(
+                chargedOn = chargedOn,
+                startTime = LocalTime.of(9, 0),
+                endTime = LocalTime.of(10, 0),
             )
 
         val chargingStrategy =
@@ -126,16 +126,16 @@ class ChargeTests {
                 mode = SURCHARGE,
                 rate = 10,
                 timeline =
-                    Timeline(specifyDate = specifyDate).apply {
+                    Timeline(specifyDate = chargedOn).apply {
                         this.addSlot(LocalTime.of(9, 0), LocalTime.of(12, 0))
                     },
             )
 
         // when
-        charge.adjust(chargingStrategy)
+        chargingUnit.adjust(chargingStrategy)
 
         // then
-        assertThat(charge.adjustments).hasSize(1)
-        assertThat(charge.amount).isEqualTo(66)
+        assertThat(chargingUnit.adjustments).hasSize(1)
+        assertThat(chargingUnit.amount).isEqualTo(66)
     }
 }

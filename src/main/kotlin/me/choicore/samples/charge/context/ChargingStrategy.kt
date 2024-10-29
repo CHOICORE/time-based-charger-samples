@@ -15,9 +15,9 @@ data class ChargingStrategy(
 
     fun supports(selectedDate: LocalDate): Boolean = this.timeline.satisfiedBy(selectedDate = selectedDate)
 
-    fun attempt(charge: Charge) {
-        require(value = this.supports(selectedDate = charge.date)) { "The specified date does not satisfy the timeline." }
-        charge.adjust(strategy = this)
+    fun attempt(chargingUnit: ChargingUnit) {
+        require(value = this.supports(selectedDate = chargingUnit.chargedOn)) { "The specified date does not satisfy the timeline." }
+        chargingUnit.adjust(strategy = this)
     }
 
     enum class Type {
