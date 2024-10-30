@@ -1,6 +1,6 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
+import me.choicore.samples.charge.domain.ChargingMode.SURCHARGE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.DayOfWeek.SUNDAY

@@ -1,11 +1,11 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingMode.DISCHARGE
-import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
-import me.choicore.samples.charge.context.ChargingStation.Supports
-import me.choicore.samples.charge.context.ChargingStatus.CHARGED
-import me.choicore.samples.charge.context.ChargingStatus.CHARGING
-import me.choicore.samples.charge.context.ChargingStatus.REGISTERED
+import me.choicore.samples.charge.domain.ChargingMode.DISCHARGE
+import me.choicore.samples.charge.domain.ChargingMode.SURCHARGE
+import me.choicore.samples.charge.domain.ChargingStation.Supports
+import me.choicore.samples.charge.domain.ChargingStatus.CHARGED
+import me.choicore.samples.charge.domain.ChargingStatus.CHARGING
+import me.choicore.samples.charge.domain.ChargingStatus.REGISTERED
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -47,11 +47,10 @@ class ChargerTests {
             var currentChargedOn: LocalDate = chargingTarget.lastChargedOn ?: chargingTarget.arrivedOn
             while (currentChargedOn <= chargedOn) {
                 val chargingUnit: ChargingUnit = chargingTarget.getChargingUnit(chargedOn = currentChargedOn)
-
                 val request =
                     ChargeRequest(
                         chargingStation = chargingStationRegistry.determine(currentChargedOn),
-                        charge = chargingUnit,
+                        chargingUnit = chargingUnit,
                     )
                 ChargerChainManager(getChargerChain(), getChargers()).charge(request)
                 chargingTarget.lastChargedOn = currentChargedOn
@@ -87,7 +86,7 @@ class ChargerTests {
     private fun getChargerChain() =
         object : ChargerChain {
             override fun charge(chargeRequest: ChargeRequest) {
-                val charge: ChargingUnit = chargeRequest.charge
+                val charge: ChargingUnit = chargeRequest.chargingUnit
                 println(
                     "Station: ${chargeRequest.chargingStation.name} - Charged on ${charge.chargedOn} from ${charge.startTime} to ${charge.endTime}",
                 )
@@ -114,7 +113,7 @@ class ChargerTests {
                             mode = DISCHARGE,
                             rate = 100,
                             timeline =
-                                Timeline(specifyDate = chargeRequest.charge.chargedOn).apply {
+                                Timeline(specifyDate = chargeRequest.chargingUnit.chargedOn).apply {
                                     this.addSlot(
                                         TimeSlot(
                                             startTimeInclusive = LocalTime.of(9, 0),
@@ -123,7 +122,7 @@ class ChargerTests {
                                     )
                                 },
                         )
-                    chargeRequest.charge.adjust(chargeStrategy)
+                    chargeRequest.chargingUnit.adjust(chargeStrategy)
                     chargerChain.charge(chargeRequest)
                 }
             },
@@ -137,7 +136,7 @@ class ChargerTests {
                             mode = SURCHARGE,
                             rate = 100,
                             timeline =
-                                Timeline(specifyDate = chargeRequest.charge.chargedOn).apply {
+                                Timeline(specifyDate = chargeRequest.chargingUnit.chargedOn).apply {
                                     this.addSlot(
                                         TimeSlot(
                                             startTimeInclusive = LocalTime.of(18, 0),
@@ -146,7 +145,7 @@ class ChargerTests {
                                     )
                                 },
                         )
-                    chargeRequest.charge.adjust(chargeStrategy)
+                    chargeRequest.chargingUnit.adjust(chargeStrategy)
                     chargerChain.charge(chargeRequest)
                 }
             },
@@ -184,6 +183,6 @@ class ChargerTests {
 
     data class ChargeRequest(
         val chargingStation: ChargingStation,
-        val charge: ChargingUnit,
+        val chargingUnit: ChargingUnit,
     )
 }

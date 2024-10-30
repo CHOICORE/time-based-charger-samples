@@ -1,8 +1,8 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingMode.DISCHARGE
-import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
-import me.choicore.samples.charge.context.ChargingUnit.Adjustment
+import me.choicore.samples.charge.domain.ChargingMode.DISCHARGE
+import me.choicore.samples.charge.domain.ChargingMode.SURCHARGE
+import me.choicore.samples.charge.domain.ChargingUnit.Adjustment
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import java.time.LocalDate
@@ -15,6 +15,11 @@ class ChargingUnitTests {
         // given
         val chargingUnit =
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = LocalDate.now(),
                 startTime = LocalTime.MIN,
                 endTime = LocalTime.MAX,
@@ -30,6 +35,11 @@ class ChargingUnitTests {
         val chargedOn: LocalDate = LocalDate.now()
         val chargingUnit =
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = chargedOn,
                 startTime = LocalTime.of(9, 0),
                 endTime = LocalTime.of(18, 0),
@@ -73,6 +83,11 @@ class ChargingUnitTests {
     fun `should throw exception for invalid time range`() {
         assertThatThrownBy {
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = LocalDate.now(),
                 startTime = LocalTime.of(18, 0),
                 endTime = LocalTime.of(9, 0),
@@ -83,10 +98,15 @@ class ChargingUnitTests {
     @Test
     fun `should calculate correct amount with multiple valid adjustments`() {
         // given
-        val specifyDate: LocalDate = LocalDate.now()
+        val chargedOn: LocalDate = LocalDate.now()
         val chargingUnit =
             ChargingUnit(
-                chargedOn = specifyDate,
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
+                chargedOn = chargedOn,
                 startTime = LocalTime.of(9, 0),
                 endTime = LocalTime.of(18, 0),
             )
@@ -96,7 +116,7 @@ class ChargingUnitTests {
                 mode = SURCHARGE,
                 rate = 10,
                 timeline =
-                    Timeline(specifyDate = specifyDate).apply {
+                    Timeline(specifyDate = chargedOn).apply {
                         this.addSlot(LocalTime.of(9, 0), LocalTime.of(12, 0))
                         this.addSlot(LocalTime.of(14, 0), LocalTime.of(16, 0))
                     },
@@ -116,6 +136,11 @@ class ChargingUnitTests {
         val chargedOn: LocalDate = LocalDate.now()
         val chargingUnit =
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = chargedOn,
                 startTime = LocalTime.of(9, 0),
                 endTime = LocalTime.of(10, 0),

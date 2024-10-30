@@ -1,4 +1,4 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -16,7 +16,6 @@ data class ChargingTarget(
     var lastChargedOn: LocalDate? = null,
 ) {
     val arrivedOn: LocalDate = arrivedAt.toLocalDate()
-
     val departedOn: LocalDate? = departedAt?.toLocalDate()
 
     fun getChargingUnit(chargedOn: LocalDate): ChargingUnit {
@@ -35,6 +34,11 @@ data class ChargingTarget(
             }
 
         return ChargingUnit(
+            targetId = this.id!!,
+            complexId = this.complexId,
+            building = this.building,
+            unit = this.unit,
+            licensePlate = this.licensePlate,
             chargedOn = chargedOn,
             startTime = startTime,
             endTime = endTime,

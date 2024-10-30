@@ -1,13 +1,20 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit.MINUTES
 
 data class ChargingUnit(
+    val id: Long? = null,
+    val targetId: Long,
+    val complexId: Long,
+    val building: String,
+    val unit: String,
+    val licensePlate: String,
     val chargedOn: LocalDate,
     val startTime: LocalTime,
     val endTime: LocalTime,
+    var deleted: Boolean = false,
 ) {
     init {
         require(this.startTime.isBefore(this.endTime)) { "The start time must be before the end time." }

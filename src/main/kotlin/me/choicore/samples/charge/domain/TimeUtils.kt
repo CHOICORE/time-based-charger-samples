@@ -1,4 +1,4 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit

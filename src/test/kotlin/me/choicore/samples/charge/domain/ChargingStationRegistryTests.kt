@@ -1,6 +1,6 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingStation.Supports
+import me.choicore.samples.charge.domain.ChargingStation.Supports
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach

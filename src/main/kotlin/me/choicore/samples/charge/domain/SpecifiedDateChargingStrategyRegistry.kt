@@ -1,6 +1,6 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingStrategy.Type
+import me.choicore.samples.charge.domain.ChargingStrategy.Type
 import java.time.LocalDate
 
 class SpecifiedDateChargingStrategyRegistry : AbstractChargingStrategyRegistry<LocalDate>() {

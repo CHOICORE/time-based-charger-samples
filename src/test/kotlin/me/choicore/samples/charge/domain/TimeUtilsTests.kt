@@ -1,4 +1,4 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

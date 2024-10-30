@@ -1,4 +1,4 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
 enum class ChargingMode {
     STANDARD {

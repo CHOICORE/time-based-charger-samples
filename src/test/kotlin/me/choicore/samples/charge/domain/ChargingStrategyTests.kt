@@ -1,7 +1,7 @@
-package me.choicore.samples.charge.context
+package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.context.ChargingMode.DISCHARGE
-import me.choicore.samples.charge.context.ChargingMode.SURCHARGE
+import me.choicore.samples.charge.domain.ChargingMode.DISCHARGE
+import me.choicore.samples.charge.domain.ChargingMode.SURCHARGE
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -46,6 +46,11 @@ class ChargingStrategyTests {
         // given
         val chargingUnit =
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = LocalDate.now(),
                 startTime = LocalTime.MIN,
                 endTime = LocalTime.MAX,
@@ -71,6 +76,11 @@ class ChargingStrategyTests {
         // given
         val chargingUnit =
             ChargingUnit(
+                targetId = 1,
+                complexId = 1,
+                building = "1",
+                unit = "1",
+                licensePlate = "1",
                 chargedOn = LocalDate.now(),
                 startTime = LocalTime.MIN,
                 endTime = LocalTime.MAX,
