@@ -20,6 +20,7 @@ class ChargerTests {
         val chargingTargets: List<ChargingTarget> =
             listOf(
                 ChargingTarget(
+                    id = 1,
                     complexId = 1,
                     building = "A",
                     unit = "101",
@@ -30,6 +31,7 @@ class ChargerTests {
                     lastChargedOn = null,
                 ),
                 ChargingTarget(
+                    id = 2,
                     complexId = 1,
                     building = "A",
                     unit = "102",
@@ -56,6 +58,100 @@ class ChargerTests {
                 chargingTarget.lastChargedOn = currentChargedOn
                 chargingTarget.status = if (chargingTarget.departedOn == currentChargedOn) CHARGED else CHARGING
                 currentChargedOn = currentChargedOn.plusDays(1)
+            }
+        }
+    }
+
+    @Test
+    fun t2() {
+        val chargingTarget =
+            ChargingTarget(
+                id = 1,
+                complexId = 1,
+                building = "A",
+                unit = "101",
+                licensePlate = "123가1234",
+                arrivedAt = LocalDateTime.now(),
+                departedAt = LocalDateTime.now().plusMinutes(25),
+                status = REGISTERED,
+                lastChargedOn = null,
+            )
+
+        val chargingUnit: ChargingUnit = chargingTarget.getChargingUnit(chargedOn = LocalDate.now())
+        println(chargingUnit.amount)
+
+        ChargingProcessorChain(
+            listOf(
+                DefaultExemptionChargingProcessor(setOf("123가15234")),
+                TurnAroundExemptionChargingProcessor(exemptionThreshold = 30),
+                StandardChargingProcessor(),
+            ),
+        ).process(chargingUnit)
+
+        println(chargingUnit.adjustments)
+        println(chargingUnit.amount)
+    }
+
+    class StandardChargingProcessor : ChargingProcessor {
+        override fun process(chargingUnit: ChargingUnit) {
+            println("기본 정책 적용")
+            chargingUnit.adjust(
+                ChargingStrategy(
+                    mode = SURCHARGE,
+                    rate = 10,
+                    timeline = Timeline.fullTime(chargingUnit.chargedOn),
+                ),
+            )
+        }
+    }
+
+    class DefaultExemptionChargingProcessor(
+        private val candidates: Set<String>,
+    ) : ChargingProcessor {
+        override fun process(chargingUnit: ChargingUnit) {
+            if (candidates.contains(chargingUnit.licensePlate)) {
+                println("정기차량 면제")
+                chargingUnit.adjust(
+                    ChargingStrategy(
+                        mode = DISCHARGE,
+                        rate = 100,
+                        timeline = Timeline.fullTime(chargingUnit.chargedOn),
+                    ),
+                )
+                chargingUnit.adjustable = false
+            } else {
+                chargingUnit.amount
+            }
+        }
+    }
+
+    class TurnAroundExemptionChargingProcessor(
+        private val exemptionThreshold: Int,
+    ) : ChargingProcessor {
+        override fun process(chargingUnit: ChargingUnit) {
+            val amount: Long = chargingUnit.amount
+            if (amount <= exemptionThreshold) {
+                println("회차 차량 면제")
+                chargingUnit.adjust(
+                    ChargingStrategy.exempt(chargingUnit.chargedOn.dayOfWeek),
+                )
+                chargingUnit.adjustable = false
+            }
+        }
+    }
+
+    interface ChargingProcessor {
+        fun process(chargingUnit: ChargingUnit)
+    }
+
+    class ChargingProcessorChain(
+        private val processors: List<ChargingProcessor>,
+    ) : ChargingProcessor {
+        override fun process(chargingUnit: ChargingUnit) {
+            for (processor in processors) {
+                if (chargingUnit.adjustable) {
+                    processor.process(chargingUnit)
+                }
             }
         }
     }

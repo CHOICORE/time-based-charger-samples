@@ -15,6 +15,7 @@ data class ChargingUnit(
     val startTime: LocalTime,
     val endTime: LocalTime,
     var deleted: Boolean = false,
+    var adjustable: Boolean = true,
 ) {
     init {
         require(this.startTime.isBefore(this.endTime)) { "The start time must be before the end time." }
