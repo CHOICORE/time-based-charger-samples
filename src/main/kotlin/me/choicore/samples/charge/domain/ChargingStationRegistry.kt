@@ -5,10 +5,10 @@ import java.time.LocalDate
 class ChargingStationRegistry(
     private val stations: List<ChargingStation>,
 ) {
-    private val cache: MutableMap<LocalDate, ChargingStation> = mutableMapOf()
+    private val cachedChargingStation: MutableMap<LocalDate, ChargingStation> = mutableMapOf()
 
     fun determine(chargedOn: LocalDate): ChargingStation =
-        this.cache.getOrPut(key = chargedOn) {
+        this.cachedChargingStation.getOrPut(key = chargedOn) {
             this.stations
                 .firstOrNull { station ->
                     when {
@@ -28,6 +28,6 @@ class ChargingStationRegistry(
     private fun hasOnlyEndsOn(station: ChargingStation): Boolean = station.startsOn == null && station.endsOn != null
 
     fun clear() {
-        this.cache.clear()
+        this.cachedChargingStation.clear()
     }
 }
