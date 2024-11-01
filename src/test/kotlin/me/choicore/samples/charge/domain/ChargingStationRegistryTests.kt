@@ -1,6 +1,6 @@
 package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.domain.ChargingStation.Supports
+import me.choicore.samples.charge.domain.ChargingStation.Comparators
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.AfterEach
@@ -22,6 +22,8 @@ class ChargingStationRegistryTests {
                             name = "기본 정책",
                             complexId = 1,
                             description = "",
+                            exemptionThreshold = 30,
+                            dischargeAmount = 120,
                             startsOn = null,
                             endsOn = null,
                         ),
@@ -30,6 +32,8 @@ class ChargingStationRegistryTests {
                             complexId = 1,
                             name = "신규 정책",
                             description = "",
+                            exemptionThreshold = 30,
+                            dischargeAmount = 120,
                             startsOn = LocalDate.of(2024, 11, 1),
                             endsOn = null,
                         ),
@@ -38,6 +42,8 @@ class ChargingStationRegistryTests {
                             complexId = 1,
                             name = "시범 정책",
                             description = "",
+                            exemptionThreshold = 30,
+                            dischargeAmount = 120,
                             startsOn = LocalDate.of(2024, 11, 1),
                             endsOn = LocalDate.of(2024, 11, 30),
                         ),
@@ -46,10 +52,12 @@ class ChargingStationRegistryTests {
                             complexId = 1,
                             name = "신규 정책",
                             description = "",
+                            exemptionThreshold = 30,
+                            dischargeAmount = 120,
                             startsOn = null,
                             endsOn = LocalDate.of(2024, 11, 1),
                         ),
-                    ).sortedWith(Supports.comparator()),
+                    ).sortedWith(Comparators.withDefaults()),
             )
     }
 
@@ -147,6 +155,8 @@ class ChargingStationRegistryTests {
                         complexId = 1,
                         name = "First Policy",
                         description = "",
+                        exemptionThreshold = 30,
+                        dischargeAmount = 120,
                         startsOn = LocalDate.of(2024, 12, 1),
                         endsOn = LocalDate.of(2024, 12, 31),
                     ),
@@ -155,10 +165,12 @@ class ChargingStationRegistryTests {
                         complexId = 1,
                         name = "Second Policy",
                         description = "",
+                        exemptionThreshold = 30,
+                        dischargeAmount = 120,
                         startsOn = LocalDate.of(2024, 12, 1),
                         endsOn = LocalDate.of(2024, 12, 31),
                     ),
-                ).sortedWith(Supports.comparator()),
+                ).sortedWith(Comparators.withDefaults()),
             )
 
         // when
