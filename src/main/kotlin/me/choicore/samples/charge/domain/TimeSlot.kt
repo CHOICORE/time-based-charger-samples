@@ -61,4 +61,13 @@ data class TimeSlot(
      * @return 이 `TimeSlot`이 하루 전체를 나타내면 `true`, 그렇지 않으면 `false`.
      */
     fun isFullTime(): Boolean = this.startTimeInclusive == LocalTime.MIN && this.endTimeInclusive == LocalTime.MAX
+
+    companion object {
+        /**
+         * 하루 전체를 나타내는 `TimeSlot`을 반환합니다.
+         *
+         * @return 하루 전체를 나타내는 `TimeSlot`.
+         */
+        val FULL_TIME: TimeSlot = TimeSlot(LocalTime.MIN, LocalTime.MAX)
+    }
 }

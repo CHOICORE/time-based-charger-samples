@@ -84,4 +84,9 @@ class TimeSlotTests {
             ),
         )
     }
+
+    @Test
+    fun `should return a time slot covering the entire day for FULL_TIME`() {
+        assertThat(TimeSlot.FULL_TIME).isEqualTo(TimeSlot(LocalTime.MIN, LocalTime.MAX))
+    }
 }
