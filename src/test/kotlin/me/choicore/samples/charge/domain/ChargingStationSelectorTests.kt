@@ -8,13 +8,13 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class ChargingStationRegistryTests {
-    private lateinit var chargingStationRegistry: ChargingStationRegistry
+class ChargingStationSelectorTests {
+    private lateinit var chargingStationSelector: ChargingStationSelector
 
     @BeforeEach
     fun setUp() {
-        chargingStationRegistry =
-            ChargingStationRegistry(
+        chargingStationSelector =
+            ChargingStationSelector(
                 stations =
                     listOf(
                         ChargingStation(
@@ -55,15 +55,15 @@ class ChargingStationRegistryTests {
                             exemptionThreshold = 30,
                             dischargeAmount = 120,
                             startsOn = null,
-                            endsOn = LocalDate.of(2024, 11, 1),
+                            endsOn = LocalDate.of(2024, 10, 31),
                         ),
-                    ).sortedWith(Comparators.withDefaults()),
+                    ),
             )
     }
 
     @AfterEach
     fun tearDown() {
-        chargingStationRegistry.clear()
+        chargingStationSelector.clear()
     }
 
     @Test
@@ -73,7 +73,7 @@ class ChargingStationRegistryTests {
 
         // when
         val result: ChargingStation =
-            chargingStationRegistry.determine(chargedOn = trialPolicyDate)
+            chargingStationSelector.select(chargedOn = trialPolicyDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -86,7 +86,7 @@ class ChargingStationRegistryTests {
         val startDate: LocalDate = LocalDate.of(2024, 11, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = startDate)
+        val result: ChargingStation = chargingStationSelector.select(chargedOn = startDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -99,7 +99,7 @@ class ChargingStationRegistryTests {
         val endDate: LocalDate = LocalDate.of(2024, 11, 30)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = endDate)
+        val result: ChargingStation = chargingStationSelector.select(chargedOn = endDate)
 
         // then
         assertThat(result.id).isEqualTo(3)
@@ -112,7 +112,7 @@ class ChargingStationRegistryTests {
         val futureDate: LocalDate = LocalDate.of(2024, 12, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = futureDate)
+        val result: ChargingStation = chargingStationSelector.select(chargedOn = futureDate)
 
         // then
         assertThat(result.id).isEqualTo(2)
@@ -125,7 +125,7 @@ class ChargingStationRegistryTests {
         val pastDate: LocalDate = LocalDate.of(2024, 10, 1)
 
         // when
-        val result: ChargingStation = chargingStationRegistry.determine(chargedOn = pastDate)
+        val result: ChargingStation = chargingStationSelector.select(chargedOn = pastDate)
 
         // then
         assertThat(result.id).isEqualTo(4)
@@ -135,11 +135,11 @@ class ChargingStationRegistryTests {
     @Test
     fun `should throw exception when no stations available`() {
         // given
-        val emptyRegistry = ChargingStationRegistry(emptyList())
+        val emptyRegistry = ChargingStationSelector(emptyList())
         val testDate: LocalDate = LocalDate.of(2024, 11, 15)
 
         // when/then
-        assertThatThrownBy { emptyRegistry.determine(chargedOn = testDate) }
+        assertThatThrownBy { emptyRegistry.select(chargedOn = testDate) }
             .isInstanceOf(IllegalStateException::class.java)
             .hasMessageContaining("No applicable ChargingStation found")
     }
@@ -148,7 +148,7 @@ class ChargingStationRegistryTests {
     fun `should apply first defined policy when multiple policies exist`() {
         // given
         val registry =
-            ChargingStationRegistry(
+            ChargingStationSelector(
                 listOf(
                     ChargingStation(
                         id = 5,
@@ -174,7 +174,7 @@ class ChargingStationRegistryTests {
             )
 
         // when
-        val result: ChargingStation = registry.determine(chargedOn = LocalDate.of(2024, 12, 15))
+        val result: ChargingStation = registry.select(chargedOn = LocalDate.of(2024, 12, 15))
 
         // then
         assertThat(result.id).isEqualTo(5)

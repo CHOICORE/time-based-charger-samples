@@ -2,12 +2,13 @@ package me.choicore.samples.charge.domain
 
 import java.time.LocalDate
 
-class ChargingStationRegistry(
-    private val stations: List<ChargingStation>,
+class ChargingStationSelector(
+    stations: List<ChargingStation>,
 ) {
+    private val stations: List<ChargingStation> = stations.sortedWith(ChargingStation.Comparators.withDefaults())
     private val cachedChargingStation: MutableMap<LocalDate, ChargingStation> = mutableMapOf()
 
-    fun determine(chargedOn: LocalDate): ChargingStation =
+    fun select(chargedOn: LocalDate): ChargingStation =
         this.cachedChargingStation.getOrPut(key = chargedOn) {
             this.stations
                 .firstOrNull { station ->
