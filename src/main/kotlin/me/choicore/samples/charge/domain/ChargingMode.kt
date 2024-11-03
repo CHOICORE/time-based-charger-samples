@@ -18,7 +18,8 @@ enum class ChargingMode {
             amount: Long,
             rate: Int,
         ): Double = amount * (rate + 100.0) / 100.0
-    }, ;
+    },
+    ;
 
     abstract fun charge(
         amount: Long,

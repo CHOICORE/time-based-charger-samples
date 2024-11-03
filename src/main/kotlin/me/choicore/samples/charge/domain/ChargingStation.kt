@@ -14,7 +14,6 @@ data class ChargingStation(
     val deleted: Boolean = false,
 ) {
     object Comparators {
-        fun withDefaults(): Comparator<ChargingStation> =
-            compareBy({ it.startsOn == null }, { it.endsOn == null }, { it.startsOn })
+        fun withDefaults(): Comparator<ChargingStation> = compareBy({ it.startsOn == null }, { it.endsOn == null }, { it.startsOn })
     }
 }
