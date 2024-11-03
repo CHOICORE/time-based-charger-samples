@@ -10,10 +10,11 @@ data class ChargingStation(
     val startsOn: LocalDate?,
     val endsOn: LocalDate?,
     val exemptionThreshold: Int,
-    val dischargeAmount: Long,
+    val dischargeAmount: Int,
     val deleted: Boolean = false,
 ) {
     object Comparators {
-        fun withDefaults(): Comparator<ChargingStation> = compareBy({ it.startsOn == null }, { it.endsOn == null }, { it.startsOn })
+        fun withDefaults(): Comparator<ChargingStation> =
+            compareBy({ it.startsOn == null }, { it.endsOn == null }, { it.startsOn })
     }
 }
