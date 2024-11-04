@@ -1,11 +1,11 @@
 package me.choicore.samples.charge.domain
 
-import me.choicore.samples.charge.domain.ChargingStrategy.Type
+import me.choicore.samples.charge.domain.ChargingStrategy.Cycle
 import java.time.LocalDate
 
-class SpecifiedDateChargingStrategyRegistry : AbstractChargingStrategyRegistry<LocalDate>() {
+class SpecifiedDateChargingStrategies : AbstractChargingStrategyRegistry<LocalDate>() {
     override fun getKey(strategy: ChargingStrategy): LocalDate {
-        check(value = Type.ONCE == strategy.type) { "The strategy does not have a specified date." }
+        check(value = Cycle.ONCE == strategy.cycle) { "The strategy does not have a specified date." }
         return strategy.specifiedDate!!
     }
 

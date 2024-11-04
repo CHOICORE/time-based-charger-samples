@@ -9,21 +9,26 @@ import java.time.LocalTime
 import java.time.temporal.TemporalAdjusters
 import java.util.EnumSet
 
-class DayOfWeekChargingStrategyRegistryTests {
+class DayOfWeekChargingStrategiesTests {
     @ParameterizedTest
     @EnumSource(value = DayOfWeek::class)
     fun `should return registered charging strategy for given day of week`(dayOfWeek: DayOfWeek) {
         // given
-        val chargingStrategy = ChargingStrategy(ChargingMode.STANDARD, 100, Timeline.fullTime(dayOfWeek))
+        val chargingStrategy =
+            ChargingStrategy(
+                mode = ChargingMode.STANDARD,
+                rate = 100,
+                timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
+            )
 
-        val registry: DayOfWeekChargingStrategyRegistry =
-            DayOfWeekChargingStrategyRegistry().apply {
-                this.register(chargingStrategy)
+        val registry: DayOfWeekChargingStrategies =
+            DayOfWeekChargingStrategies().apply {
+                this.register(strategy = chargingStrategy)
             }
 
         // when
         val date: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(dayOfWeek))
-        val result: List<ChargingStrategy> = registry.getChargingStrategies(date)
+        val result: List<ChargingStrategy> = registry.getChargingStrategies(date = date)
 
         // then
         assertThat(result).isNotEmpty
@@ -36,14 +41,20 @@ class DayOfWeekChargingStrategyRegistryTests {
         // given
         val chargingStrategy =
             ChargingStrategy(
-                ChargingMode.SURCHARGE,
-                10,
-                Timeline(dayOfWeek).apply { addSlot(LocalTime.MIDNIGHT, LocalTime.of(4, 0)) },
+                mode = ChargingMode.SURCHARGE,
+                rate = 10,
+                timeline =
+                    Timeline(dayOfWeek).apply {
+                        addSlot(
+                            startTimeInclusive = LocalTime.MIDNIGHT,
+                            endTimeInclusive = LocalTime.of(4, 0),
+                        )
+                    },
             )
 
-        val registry: DayOfWeekChargingStrategyRegistry =
-            DayOfWeekChargingStrategyRegistry().apply {
-                this.register(chargingStrategy)
+        val registry: DayOfWeekChargingStrategies =
+            DayOfWeekChargingStrategies().apply {
+                this.register(strategy = chargingStrategy)
             }
 
         // when
@@ -51,11 +62,11 @@ class DayOfWeekChargingStrategyRegistryTests {
 
         unregisteredDays.forEach { day ->
             val date: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(day))
-            val result: List<ChargingStrategy> = registry.getChargingStrategies(date)
+            val result: List<ChargingStrategy> = registry.getChargingStrategies(date = date)
 
             // then
             assertThat(result).isNotEmpty
-            assertThat(result[0]).isEqualTo(ChargingStrategy.noop(day))
+            assertThat(result[0]).isEqualTo(ChargingStrategy.noop(dayOfWeek = day))
         }
     }
 }

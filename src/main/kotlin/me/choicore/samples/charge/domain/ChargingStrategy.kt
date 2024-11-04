@@ -4,6 +4,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 data class ChargingStrategy(
+    val id: Long? = null,
     val mode: ChargingMode,
     val rate: Int,
     val timeline: Timeline,
@@ -11,7 +12,7 @@ data class ChargingStrategy(
     val dayOfWeek: DayOfWeek = this.timeline.dayOfWeek
     val specifiedDate: LocalDate? = this.timeline.specifiedDate
 
-    val type: Type = if (this.specifiedDate != null) Type.ONCE else Type.REPEATABLE
+    val cycle: Cycle = if (this.specifiedDate != null) Cycle.ONCE else Cycle.REPEATABLE
 
     fun supports(selectedDate: LocalDate): Boolean = this.timeline.satisfiedBy(selectedDate = selectedDate)
 
@@ -20,7 +21,7 @@ data class ChargingStrategy(
         chargingUnit.adjust(strategy = this)
     }
 
-    enum class Type {
+    enum class Cycle {
         REPEATABLE,
         ONCE,
     }
