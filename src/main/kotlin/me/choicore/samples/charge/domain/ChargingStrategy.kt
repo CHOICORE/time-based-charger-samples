@@ -11,7 +11,6 @@ data class ChargingStrategy(
 ) {
     val dayOfWeek: DayOfWeek = this.timeline.dayOfWeek
     val specifiedDate: LocalDate? = this.timeline.specifiedDate
-
     val cycle: Cycle = if (this.specifiedDate != null) Cycle.ONCE else Cycle.REPEATABLE
 
     fun supports(selectedDate: LocalDate): Boolean = this.timeline.satisfiedBy(selectedDate = selectedDate)
