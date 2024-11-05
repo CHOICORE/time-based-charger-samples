@@ -26,11 +26,18 @@ data class ChargingStrategy(
     }
 
     companion object {
-        fun noop(dayOfWeek: DayOfWeek): ChargingStrategy =
+        fun standard(dayOfWeek: DayOfWeek): ChargingStrategy =
             ChargingStrategy(
-                mode = ChargingMode.STANDARD,
+                mode = ChargingMode.DEFAULT,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
+            )
+
+        fun standard(timeline: Timeline): ChargingStrategy =
+            ChargingStrategy(
+                mode = ChargingMode.DEFAULT,
+                rate = 100,
+                timeline = timeline,
             )
 
         fun exempt(dayOfWeek: DayOfWeek): ChargingStrategy =
@@ -39,5 +46,13 @@ data class ChargingStrategy(
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
+
+        fun exempt(timeline: Timeline) {
+            ChargingStrategy(
+                mode = ChargingMode.DISCHARGE,
+                rate = 100,
+                timeline = timeline,
+            )
+        }
     }
 }

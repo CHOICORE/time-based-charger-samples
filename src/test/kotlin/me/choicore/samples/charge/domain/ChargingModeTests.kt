@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Test
 class ChargingModeTests {
     @Test
     fun `should return the same amount when charging with noop strategy`() {
-        val standard = ChargingMode.STANDARD
+        val default = ChargingMode.DEFAULT
         val minutes = 1000L
         val rate = 10
-        val charged: Double = standard.charge(amount = minutes, rate = rate)
+        val charged: Double = default.charge(amount = minutes, rate = rate)
         assertThat(charged).isEqualTo(1000.0)
     }
 

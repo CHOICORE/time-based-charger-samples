@@ -20,9 +20,19 @@ class CompositeChargingStrategiesTests {
             CompositeChargingStrategies
                 .builder()
                 .once(chargingStrategy = surchargeStrategy)
-                .repeatable(chargingStrategy = ChargingStrategy.noop(FRIDAY))
-                .repeatable(chargingStrategy = ChargingStrategy.noop(SUNDAY))
-                .repeatable(chargingStrategy = ChargingStrategy.noop(SATURDAY))
+                .once(
+                    chargingStrategy =
+                        surchargeStrategy.copy(
+                            timeline =
+                                Timeline.fullTime(
+                                    specifyDate = LocalDate.now().plusDays(1),
+                                ),
+                        ),
+                ).repeatable(chargingStrategy = ChargingStrategy.standard(FRIDAY))
+                .repeatable(chargingStrategy = ChargingStrategy.standard(SUNDAY))
+                .repeatable(chargingStrategy = ChargingStrategy.standard(SATURDAY))
                 .build()
+
+        strategies.getChargingStrategies(date = LocalDate.now()).forEach { println(it) }
     }
 }

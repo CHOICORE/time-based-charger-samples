@@ -16,7 +16,7 @@ class DayOfWeekChargingStrategiesTests {
         // given
         val chargingStrategy =
             ChargingStrategy(
-                mode = ChargingMode.STANDARD,
+                mode = ChargingMode.DEFAULT,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
@@ -66,7 +66,7 @@ class DayOfWeekChargingStrategiesTests {
 
             // then
             assertThat(result).isNotEmpty
-            assertThat(result[0]).isEqualTo(ChargingStrategy.noop(dayOfWeek = day))
+            assertThat(result[0]).isEqualTo(ChargingStrategy.standard(dayOfWeek = day))
         }
     }
 }

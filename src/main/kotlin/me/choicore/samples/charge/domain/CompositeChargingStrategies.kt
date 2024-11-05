@@ -13,16 +13,16 @@ class CompositeChargingStrategies private constructor(
         ),
     )
 
-    class Builder {
+    class CompositeChargingStrategiesBuilder {
         private val specifiedDateChargingStrategies: SpecifiedDateChargingStrategies = SpecifiedDateChargingStrategies()
         private val dayOfWeekChargingStrategies: DayOfWeekChargingStrategies = DayOfWeekChargingStrategies()
 
-        fun once(chargingStrategy: ChargingStrategy): Builder {
+        fun once(chargingStrategy: ChargingStrategy): CompositeChargingStrategiesBuilder {
             this.specifiedDateChargingStrategies.register(strategy = chargingStrategy)
             return this
         }
 
-        fun repeatable(chargingStrategy: ChargingStrategy): Builder {
+        fun repeatable(chargingStrategy: ChargingStrategy): CompositeChargingStrategiesBuilder {
             this.dayOfWeekChargingStrategies.register(strategy = chargingStrategy)
             return this
         }
@@ -44,17 +44,20 @@ class CompositeChargingStrategies private constructor(
     }
 
     override fun getChargingStrategies(date: LocalDate): List<ChargingStrategy> =
-        this.getOnceStrategies(date).ifEmpty { getRepeatableStrategies(date) }
+        this.getOnceStrategies(date).ifEmpty { getRepeatableStrategies(date = date) }
 
-    private fun getOnceStrategies(date: LocalDate): List<ChargingStrategy> = this.registries[ONCE_STRATEGY]!!.getChargingStrategies(date)
+    private fun getOnceStrategies(date: LocalDate): List<ChargingStrategy> =
+        this.registries[ONCE_STRATEGY]!!.getChargingStrategies(
+            date = date,
+        )
 
     private fun getRepeatableStrategies(date: LocalDate): List<ChargingStrategy> =
-        this.registries[REPEATABLE_STRATEGY]!!.getChargingStrategies(date)
+        this.registries[REPEATABLE_STRATEGY]!!.getChargingStrategies(date = date)
 
     companion object {
         private val ONCE_STRATEGY = ChargingStrategy.Cycle.ONCE
         private val REPEATABLE_STRATEGY = ChargingStrategy.Cycle.REPEATABLE
 
-        fun builder(): Builder = Builder()
+        fun builder(): CompositeChargingStrategiesBuilder = CompositeChargingStrategiesBuilder()
     }
 }

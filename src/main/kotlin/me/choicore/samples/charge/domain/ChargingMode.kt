@@ -1,11 +1,15 @@
 package me.choicore.samples.charge.domain
 
 enum class ChargingMode {
-    STANDARD {
+    DEFAULT {
         override fun charge(
             amount: Long,
             rate: Int,
         ): Double = amount.toDouble()
+
+        fun charge(amount: Long) {
+            charge(amount = amount, rate = 0)
+        }
     },
     DISCHARGE {
         override fun charge(

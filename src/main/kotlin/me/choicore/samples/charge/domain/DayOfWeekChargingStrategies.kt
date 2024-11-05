@@ -12,5 +12,6 @@ class DayOfWeekChargingStrategies : AbstractChargingStrategyRegistry<DayOfWeek>(
 
     override fun getKeyForDate(date: LocalDate): DayOfWeek = date.dayOfWeek
 
-    override fun getDefaultStrategies(date: LocalDate): List<ChargingStrategy> = listOf(ChargingStrategy.noop(dayOfWeek = date.dayOfWeek))
+    override fun getDefaultStrategies(date: LocalDate): List<ChargingStrategy> =
+        listOf(ChargingStrategy.standard(dayOfWeek = date.dayOfWeek))
 }

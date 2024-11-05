@@ -20,7 +20,7 @@ interface ChargerChain {
             this.currentPosition++
             val nextCharger: Charger = this.chargers[this.currentPosition - 1]
             log.info("ChargerChain: ${nextCharger.javaClass.simpleName} ($currentPosition/$size)")
-            nextCharger.charge(chargeRequest, this)
+            nextCharger.charge(chargeRequest = chargeRequest, chargerChain = this)
         }
 
         companion object {
@@ -29,6 +29,6 @@ interface ChargerChain {
     }
 
     companion object {
-        fun create(chargers: List<Charger>): ChargerChain = DefaultChargerChain(chargers)
+        fun create(chargers: List<Charger>): ChargerChain = DefaultChargerChain(chargers = chargers)
     }
 }
