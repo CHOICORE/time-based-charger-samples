@@ -2,6 +2,7 @@ package me.choicore.samples.charge.domain
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.math.BigDecimal
 
 class ChargingModeTests {
     @Test
@@ -9,8 +10,8 @@ class ChargingModeTests {
         val none = ChargingMode.NONE
         val minutes = 1000L
         val rate = 10
-        val charged: Double = none.charge(amount = minutes, rate = rate)
-        assertThat(charged).isEqualTo(1000.0)
+        val charged: BigDecimal = none.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualByComparingTo(BigDecimal.valueOf(1000))
     }
 
     @Test
@@ -18,8 +19,8 @@ class ChargingModeTests {
         val surcharge = ChargingMode.SURCHARGE
         val minutes = 1000L
         val rate = 10
-        val charged: Double = surcharge.charge(amount = minutes, rate = rate)
-        assertThat(charged).isEqualTo(1100.0)
+        val charged: BigDecimal = surcharge.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualByComparingTo(BigDecimal.valueOf(1100))
     }
 
     @Test
@@ -27,7 +28,7 @@ class ChargingModeTests {
         val discharge = ChargingMode.DISCHARGE
         val minutes = 1000L
         val rate = 10
-        val charged: Double = discharge.charge(amount = minutes, rate = rate)
-        assertThat(charged).isEqualTo(900.0)
+        val charged: BigDecimal = discharge.charge(amount = minutes, rate = rate)
+        assertThat(charged).isEqualByComparingTo(BigDecimal.valueOf(900))
     }
 }

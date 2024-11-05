@@ -1,32 +1,39 @@
 package me.choicore.samples.charge.domain
 
+import java.math.BigDecimal
+
 enum class ChargingMode {
     NONE {
         override fun charge(
-            amount: Long,
-            rate: Int,
-        ): Double = amount.toDouble()
+            amount: BigDecimal,
+            rate: BigDecimal,
+        ): BigDecimal = amount
 
-        fun charge(amount: Long) {
-            charge(amount = amount, rate = 0)
+        fun charge(amount: BigDecimal) {
+            charge(amount = amount, rate = BigDecimal.ZERO)
         }
     },
     DISCHARGE {
         override fun charge(
-            amount: Long,
-            rate: Int,
-        ): Double = (100.0 - rate) * amount / 100.0
+            amount: BigDecimal,
+            rate: BigDecimal,
+        ): BigDecimal = amount.multiply(BigDecimal(100).subtract(rate).divide(BigDecimal(100)))
     },
     SURCHARGE {
         override fun charge(
-            amount: Long,
-            rate: Int,
-        ): Double = amount * (rate + 100.0) / 100.0
+            amount: BigDecimal,
+            rate: BigDecimal,
+        ): BigDecimal = amount.multiply(rate.add(BigDecimal(100)).divide(BigDecimal(100)))
     },
     ;
 
     abstract fun charge(
+        amount: BigDecimal,
+        rate: BigDecimal,
+    ): BigDecimal
+
+    fun charge(
         amount: Long,
         rate: Int,
-    ): Double
+    ): BigDecimal = charge(amount = BigDecimal(amount), rate = BigDecimal(rate))
 }
