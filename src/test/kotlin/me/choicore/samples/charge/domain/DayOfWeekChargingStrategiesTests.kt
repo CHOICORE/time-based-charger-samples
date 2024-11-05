@@ -16,7 +16,7 @@ class DayOfWeekChargingStrategiesTests {
         // given
         val chargingStrategy =
             ChargingStrategy(
-                mode = ChargingMode.DEFAULT,
+                mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )

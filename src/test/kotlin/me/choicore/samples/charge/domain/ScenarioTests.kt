@@ -64,7 +64,7 @@ class ScenarioTests {
                 timeline =
                     Timeline(dayOfWeek).apply {
                         addSlot(
-                            startTimeInclusive = LocalTime.of(2, 0),
+                            startTimeInclusive = LocalTime.of(0, 0),
                             endTimeInclusive = LocalTime.of(4, 0),
                         )
                     },
@@ -76,8 +76,8 @@ class ScenarioTests {
                 timeline =
                     Timeline(dayOfWeek).apply {
                         addSlot(
-                            startTimeInclusive = LocalTime.of(5, 0),
-                            endTimeInclusive = LocalTime.of(7, 0),
+                            startTimeInclusive = LocalTime.of(6, 0),
+                            endTimeInclusive = LocalTime.of(8, 0),
                         )
                     },
             )
@@ -93,14 +93,15 @@ class ScenarioTests {
                         )
                     },
             )
-        val strategies =
+
+        val strategies: CompositeChargingStrategies =
             CompositeChargingStrategies
                 .builder()
                 .repeatable(chargingStrategy = surchargeStrategy)
                 .repeatable(chargingStrategy = dischargeStrategy1)
                 .repeatable(chargingStrategy = dischargeStrategy2)
                 .build()
-        val chargingStrategies = strategies.getChargingStrategies(date = LocalDate.now())
+
         val chargingUnit =
             ChargingUnit(
                 id = 1,
@@ -111,10 +112,16 @@ class ScenarioTests {
                 licensePlate = "123가1234",
                 chargedOn = LocalDate.now(),
                 startTime = LocalTime.MIN,
-                endTime = LocalTime.MAX,
+                endTime = LocalTime.of(23, 0),
             )
-        chargingStrategies.forEach { it.attempt(chargingUnit) }
-        chargingUnit.adjustments.forEach { println("${it.basis}에 포함되서 ${it.applied} ${it.rate}% ${it.mode} 처리, 정산: ${it.amount}분") }
+
+        println("청구 날짜: ${chargingUnit.chargedOn} start: ${chargingUnit.startTime} end: ${chargingUnit.endTime}")
+        strategies.getChargingStrategies(date = LocalDate.now()).forEach { it.attempt(chargingUnit) }
+        chargingUnit.adjustments.forEach {
+            println(
+                "감지된 구간: ${it.basis}, 실제 적용된 구간: ${it.applied} ${it.rate}% ${it.mode.label()}, 정산: ${it.amount}분",
+            )
+        }
         println(
             "총 이용 시간: ${
                 TimeUtils.duration(
@@ -125,4 +132,11 @@ class ScenarioTests {
             }분, 총 부과 시간: ${chargingUnit.amount}분",
         )
     }
+
+    fun ChargingMode.label(): String =
+        when (this) {
+            ChargingMode.NONE -> " - "
+            ChargingMode.SURCHARGE -> "할증"
+            ChargingMode.DISCHARGE -> "할인"
+        }
 }

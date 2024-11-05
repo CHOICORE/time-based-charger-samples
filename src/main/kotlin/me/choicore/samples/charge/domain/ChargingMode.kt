@@ -1,7 +1,7 @@
 package me.choicore.samples.charge.domain
 
 enum class ChargingMode {
-    DEFAULT {
+    NONE {
         override fun charge(
             amount: Long,
             rate: Int,

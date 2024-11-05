@@ -28,14 +28,14 @@ data class ChargingStrategy(
     companion object {
         fun standard(dayOfWeek: DayOfWeek): ChargingStrategy =
             ChargingStrategy(
-                mode = ChargingMode.DEFAULT,
+                mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
 
         fun standard(timeline: Timeline): ChargingStrategy =
             ChargingStrategy(
-                mode = ChargingMode.DEFAULT,
+                mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = timeline,
             )
