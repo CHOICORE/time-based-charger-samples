@@ -5,9 +5,11 @@ import java.time.LocalDate
 
 data class ChargingStrategy(
     val id: Long? = null,
+    val stationId: Long,
     val mode: ChargingMode,
     val rate: Int,
     val timeline: Timeline,
+    var deleted: Boolean = false,
 ) {
     val dayOfWeek: DayOfWeek = this.timeline.dayOfWeek
     val specifiedDate: LocalDate? = this.timeline.specifiedDate
@@ -26,29 +28,56 @@ data class ChargingStrategy(
     }
 
     companion object {
-        fun standard(dayOfWeek: DayOfWeek): ChargingStrategy =
+        fun standard(
+            stationId: Long,
+            dayOfWeek: DayOfWeek,
+        ): ChargingStrategy =
             ChargingStrategy(
+                stationId = stationId,
                 mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
 
-        fun standard(timeline: Timeline): ChargingStrategy =
+        fun standard(
+            stationId: Long,
+            timeline: Timeline,
+        ): ChargingStrategy =
             ChargingStrategy(
+                stationId = stationId,
                 mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = timeline,
             )
 
-        fun exempt(dayOfWeek: DayOfWeek): ChargingStrategy =
+        fun exempt(
+            stationId: Long,
+            dayOfWeek: DayOfWeek,
+        ): ChargingStrategy =
             ChargingStrategy(
+                stationId = stationId,
                 mode = ChargingMode.DISCHARGE,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
 
-        fun exempt(timeline: Timeline) {
+        fun exempt(
+            stationId: Long,
+            chargedOn: LocalDate,
+        ): ChargingStrategy =
             ChargingStrategy(
+                stationId = stationId,
+                mode = ChargingMode.DISCHARGE,
+                rate = 100,
+                timeline = Timeline.fullTime(specifyDate = chargedOn),
+            )
+
+        fun exempt(
+            stationId: Long,
+            timeline: Timeline,
+        ) {
+            ChargingStrategy(
+                stationId = stationId,
                 mode = ChargingMode.DISCHARGE,
                 rate = 100,
                 timeline = timeline,

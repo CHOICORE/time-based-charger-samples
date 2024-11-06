@@ -3,7 +3,9 @@ package me.choicore.samples.charge.domain
 import me.choicore.samples.charge.domain.ChargingStrategy.Cycle
 import java.time.LocalDate
 
-class SpecifiedDateChargingStrategies : AbstractChargingStrategyRegistry<LocalDate>() {
+class SpecifiedDateChargingStrategies(
+    station: ChargingStation,
+) : AbstractChargingStrategies<LocalDate>(station = station) {
     override fun getKey(strategy: ChargingStrategy): LocalDate {
         check(value = Cycle.ONCE == strategy.cycle) { "The strategy does not have a specified date." }
         return strategy.specifiedDate!!

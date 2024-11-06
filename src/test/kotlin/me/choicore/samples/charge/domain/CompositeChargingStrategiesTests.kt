@@ -12,14 +12,25 @@ class CompositeChargingStrategiesTests {
     fun t1() {
         val surchargeStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = SURCHARGE,
                 rate = 10,
                 timeline = Timeline.fullTime(specifyDate = LocalDate.now()),
             )
         val strategies =
             CompositeChargingStrategies
-                .builder()
-                .once(chargingStrategy = surchargeStrategy)
+                .builder(
+                    ChargingStation(
+                        id = 1,
+                        name = "기본 정책",
+                        complexId = 1,
+                        description = "",
+                        exemptionThreshold = 30,
+                        dischargeAmount = 120,
+                        startsOn = null,
+                        endsOn = null,
+                    ),
+                ).once(chargingStrategy = surchargeStrategy)
                 .once(
                     chargingStrategy =
                         surchargeStrategy.copy(
@@ -28,9 +39,9 @@ class CompositeChargingStrategiesTests {
                                     specifyDate = LocalDate.now().plusDays(1),
                                 ),
                         ),
-                ).repeatable(chargingStrategy = ChargingStrategy.standard(FRIDAY))
-                .repeatable(chargingStrategy = ChargingStrategy.standard(SUNDAY))
-                .repeatable(chargingStrategy = ChargingStrategy.standard(SATURDAY))
+                ).repeatable(chargingStrategy = ChargingStrategy.standard(stationId = 1L, dayOfWeek = FRIDAY))
+                .repeatable(chargingStrategy = ChargingStrategy.standard(stationId = 1L, dayOfWeek = SUNDAY))
+                .repeatable(chargingStrategy = ChargingStrategy.standard(stationId = 1L, dayOfWeek = SATURDAY))
                 .build()
 
         strategies.getChargingStrategies(date = LocalDate.now()).forEach { println(it) }

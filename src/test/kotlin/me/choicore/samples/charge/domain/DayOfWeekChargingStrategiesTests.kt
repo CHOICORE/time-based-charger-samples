@@ -16,13 +16,25 @@ class DayOfWeekChargingStrategiesTests {
         // given
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = ChargingMode.NONE,
                 rate = 100,
                 timeline = Timeline.fullTime(dayOfWeek = dayOfWeek),
             )
 
         val registry: DayOfWeekChargingStrategies =
-            DayOfWeekChargingStrategies().apply {
+            DayOfWeekChargingStrategies(
+                ChargingStation(
+                    id = 1,
+                    name = "기본 정책",
+                    complexId = 1,
+                    description = "",
+                    exemptionThreshold = 30,
+                    dischargeAmount = 120,
+                    startsOn = null,
+                    endsOn = null,
+                ),
+            ).apply {
                 this.register(strategy = chargingStrategy)
             }
 
@@ -41,6 +53,7 @@ class DayOfWeekChargingStrategiesTests {
         // given
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = ChargingMode.SURCHARGE,
                 rate = 10,
                 timeline =
@@ -53,7 +66,18 @@ class DayOfWeekChargingStrategiesTests {
             )
 
         val registry: DayOfWeekChargingStrategies =
-            DayOfWeekChargingStrategies().apply {
+            DayOfWeekChargingStrategies(
+                ChargingStation(
+                    id = 1,
+                    name = "기본 정책",
+                    complexId = 1,
+                    description = "",
+                    exemptionThreshold = 30,
+                    dischargeAmount = 120,
+                    startsOn = null,
+                    endsOn = null,
+                ),
+            ).apply {
                 this.register(strategy = chargingStrategy)
             }
 
@@ -66,7 +90,7 @@ class DayOfWeekChargingStrategiesTests {
 
             // then
             assertThat(result).isNotEmpty
-            assertThat(result[0]).isEqualTo(ChargingStrategy.standard(dayOfWeek = day))
+            assertThat(result[0]).isEqualTo(ChargingStrategy.standard(stationId = 1L, dayOfWeek = day))
         }
     }
 }

@@ -16,7 +16,12 @@ class ChargingStrategyTests {
     fun `should return true when strategy is supported for specified date`() {
         val date: LocalDate = LocalDate.now()
         val chargingStrategy =
-            ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(specifyDate = date))
+            ChargingStrategy(
+                stationId = 1L,
+                mode = SURCHARGE,
+                rate = 10,
+                timeline = Timeline.fullTime(specifyDate = date),
+            )
         assertThat(chargingStrategy.supports(selectedDate = date)).isTrue
     }
 
@@ -24,7 +29,12 @@ class ChargingStrategyTests {
     fun `should return false when strategy is not supported for specified date`() {
         val date: LocalDate = LocalDate.now()
         val chargingStrategy =
-            ChargingStrategy(mode = SURCHARGE, rate = 10, timeline = Timeline.fullTime(specifyDate = date))
+            ChargingStrategy(
+                stationId = 1L,
+                mode = SURCHARGE,
+                rate = 10,
+                timeline = Timeline.fullTime(specifyDate = date),
+            )
         assertThat(chargingStrategy.supports(selectedDate = date.plusDays(1))).isFalse
     }
 
@@ -34,6 +44,7 @@ class ChargingStrategyTests {
         val date: LocalDate = LocalDate.now().with(TemporalAdjusters.previousOrSame(dayOfWeek))
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = SURCHARGE,
                 rate = 10,
                 timeline = Timeline.fullTime(specifyDate = date),
@@ -58,6 +69,7 @@ class ChargingStrategyTests {
 
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = DISCHARGE,
                 rate = 10,
                 timeline = Timeline.fullTime(specifyDate = LocalDate.now()),
@@ -86,7 +98,8 @@ class ChargingStrategyTests {
                 endTime = LocalTime.MAX,
             )
 
-        val chargingStrategy: ChargingStrategy = ChargingStrategy.exempt(dayOfWeek = LocalDate.now().dayOfWeek)
+        val chargingStrategy: ChargingStrategy =
+            ChargingStrategy.exempt(stationId = 1L, dayOfWeek = LocalDate.now().dayOfWeek)
 
         // when
         chargingStrategy.attempt(chargingUnit = chargingUnit)

@@ -59,6 +59,7 @@ class ScenarioTests {
         val dayOfWeek = LocalDate.now().dayOfWeek
         val surchargeStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = ChargingMode.SURCHARGE,
                 rate = 10,
                 timeline =
@@ -71,6 +72,7 @@ class ScenarioTests {
             )
         val dischargeStrategy1 =
             ChargingStrategy(
+                stationId = 1L,
                 mode = ChargingMode.DISCHARGE,
                 rate = 100,
                 timeline =
@@ -83,6 +85,7 @@ class ScenarioTests {
             )
         val dischargeStrategy2 =
             ChargingStrategy(
+                stationId = 1L,
                 mode = ChargingMode.DISCHARGE,
                 rate = 100,
                 timeline =
@@ -96,7 +99,18 @@ class ScenarioTests {
 
         val strategies: CompositeChargingStrategies =
             CompositeChargingStrategies
-                .builder()
+                .builder(
+                    ChargingStation(
+                        id = 1,
+                        name = "기본 정책",
+                        complexId = 1,
+                        description = "",
+                        exemptionThreshold = 30,
+                        dischargeAmount = 120,
+                        startsOn = null,
+                        endsOn = null,
+                    ),
+                ).once(chargingStrategy = ChargingStrategy.exempt(1L, LocalDate.now()))
                 .repeatable(chargingStrategy = surchargeStrategy)
                 .repeatable(chargingStrategy = dischargeStrategy1)
                 .repeatable(chargingStrategy = dischargeStrategy2)
@@ -111,7 +125,7 @@ class ScenarioTests {
                 unit = "101",
                 licensePlate = "123가1234",
                 chargedOn = LocalDate.now(),
-                startTime = LocalTime.MIN,
+                startTime = LocalTime.of(4, 0),
                 endTime = LocalTime.of(23, 0),
             )
 
@@ -122,6 +136,7 @@ class ScenarioTests {
                 "감지된 구간: ${it.basis}, 실제 적용된 구간: ${it.applied} ${it.rate}% ${it.mode.label()}, 정산: ${it.amount}분",
             )
         }
+        print("청구 날짜: ${chargingUnit.chargedOn} start: ${chargingUnit.startTime} end: ${chargingUnit.endTime}")
         println(
             "총 이용 시간: ${
                 TimeUtils.duration(

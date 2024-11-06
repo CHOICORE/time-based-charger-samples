@@ -3,11 +3,15 @@ package me.choicore.samples.charge.domain
 import java.time.LocalDate
 import java.time.LocalTime
 
-abstract class AbstractChargingStrategyRegistry<K> : ChargingStrategyRegistry {
+abstract class AbstractChargingStrategies<K>(
+    val station: ChargingStation,
+) : ChargingStrategies {
     private val strategies: MutableMap<K, MutableList<ChargingStrategy>> = mutableMapOf()
-    private var fulfilled = false
+    private var _fulfilled = false
+    val fulfilled: Boolean get() = this._fulfilled
 
     override fun register(strategy: ChargingStrategy) {
+        this.validate(strategy = strategy)
         val key: K = this.getKey(strategy = strategy)
         val existingStrategies: MutableList<ChargingStrategy> = this.strategies.getOrPut(key = key) { mutableListOf() }
 
@@ -21,7 +25,7 @@ abstract class AbstractChargingStrategyRegistry<K> : ChargingStrategyRegistry {
     protected abstract fun getKey(strategy: ChargingStrategy): K
 
     override fun getChargingStrategies(date: LocalDate): List<ChargingStrategy> {
-        val chargingStrategies = this.strategies[this.getKeyForDate(date = date)]
+        val chargingStrategies: MutableList<ChargingStrategy>? = this.strategies[this.getKeyForDate(date = date)]
         if (chargingStrategies.isNullOrEmpty()) {
             return this.getDefaultStrategies(date = date)
         }
@@ -29,11 +33,12 @@ abstract class AbstractChargingStrategyRegistry<K> : ChargingStrategyRegistry {
     }
 
     private fun fulfilledRemainingStrategies(date: LocalDate): List<ChargingStrategy> {
-        val chargingStrategies = this.strategies[this.getKeyForDate(date = date)]!!
-        if (!this.fulfilled) {
-            val existingTimeSlots = chargingStrategies.flatMap { it.timeline.slots }.sortedBy { it.startTimeInclusive }
+        val chargingStrategies: MutableList<ChargingStrategy> = this.strategies[this.getKeyForDate(date = date)]!!
+        if (!this._fulfilled) {
+            val existingTimeSlots: List<TimeSlot> =
+                chargingStrategies.flatMap { it.timeline.slots }.sortedBy { it.startTimeInclusive }
             val remainingTimeline = Timeline(date.dayOfWeek)
-            var previous = LocalTime.MIDNIGHT
+            var previous: LocalTime = LocalTime.MIDNIGHT
             existingTimeSlots.forEach { slot ->
                 if (slot.startTimeInclusive > previous) {
                     remainingTimeline.addSlot(previous, slot.startTimeInclusive)
@@ -44,9 +49,14 @@ abstract class AbstractChargingStrategyRegistry<K> : ChargingStrategyRegistry {
                 remainingTimeline.addSlot(previous, LocalTime.MAX)
             }
             if (remainingTimeline.slots.isNotEmpty()) {
-                chargingStrategies.add(ChargingStrategy.standard(timeline = remainingTimeline))
+                chargingStrategies.add(
+                    ChargingStrategy.standard(
+                        stationId = this.station.id!!,
+                        timeline = remainingTimeline,
+                    ),
+                )
             }
-            fulfilled = true
+            _fulfilled = true
         }
         return chargingStrategies
     }
@@ -55,7 +65,11 @@ abstract class AbstractChargingStrategyRegistry<K> : ChargingStrategyRegistry {
 
     protected abstract fun getDefaultStrategies(date: LocalDate): List<ChargingStrategy>
 
-    protected abstract class AbstractChargingStrategyRegistryBuilder<K, T : AbstractChargingStrategyRegistry<K>> {
+    protected abstract class AbstractChargingStrategyRegistryBuilder<K, T : AbstractChargingStrategies<K>> {
         abstract fun build(): T
+    }
+
+    private fun validate(strategy: ChargingStrategy) {
+        check(value = this.station.id == strategy.stationId) { "The strategy is for a different station." }
     }
 }

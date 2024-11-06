@@ -11,10 +11,26 @@ class SpecifiedDateChargingStrategiesTests {
         val date: LocalDate = LocalDate.now()
 
         val surchargingStrategy =
-            ChargingStrategy(mode = ChargingMode.SURCHARGE, rate = 10, timeline = Timeline.fullTime(specifyDate = date))
+            ChargingStrategy(
+                stationId = 1L,
+                mode = ChargingMode.SURCHARGE,
+                rate = 10,
+                timeline = Timeline.fullTime(specifyDate = date),
+            )
 
         val registry: SpecifiedDateChargingStrategies =
-            SpecifiedDateChargingStrategies().apply {
+            SpecifiedDateChargingStrategies(
+                ChargingStation(
+                    id = 1,
+                    name = "기본 정책",
+                    complexId = 1,
+                    description = "",
+                    exemptionThreshold = 30,
+                    dischargeAmount = 120,
+                    startsOn = null,
+                    endsOn = null,
+                ),
+            ).apply {
                 this.register(strategy = surchargingStrategy)
             }
 
@@ -32,10 +48,26 @@ class SpecifiedDateChargingStrategiesTests {
         val date: LocalDate = LocalDate.now()
 
         val surchargingStrategy =
-            ChargingStrategy(mode = ChargingMode.SURCHARGE, rate = 10, timeline = Timeline.fullTime(date))
+            ChargingStrategy(
+                stationId = 1L,
+                mode = ChargingMode.SURCHARGE,
+                rate = 10,
+                timeline = Timeline.fullTime(date),
+            )
 
         val registry: SpecifiedDateChargingStrategies =
-            SpecifiedDateChargingStrategies().apply {
+            SpecifiedDateChargingStrategies(
+                ChargingStation(
+                    id = 1,
+                    name = "기본 정책",
+                    complexId = 1,
+                    description = "",
+                    exemptionThreshold = 30,
+                    dischargeAmount = 120,
+                    startsOn = null,
+                    endsOn = null,
+                ),
+            ).apply {
                 this.register(strategy = surchargingStrategy)
             }
 

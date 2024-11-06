@@ -4,18 +4,22 @@ import java.time.LocalDate
 import java.time.temporal.TemporalAdjuster
 
 class CompositeChargingStrategies private constructor(
-    private val registries: Map<ChargingStrategy.Cycle, AbstractChargingStrategyRegistry<out TemporalAdjuster>>,
-) : ChargingStrategyRegistry {
-    constructor() : this(
+    private val registries: Map<ChargingStrategy.Cycle, AbstractChargingStrategies<out TemporalAdjuster>>,
+) : ChargingStrategies {
+    constructor(station: ChargingStation) : this(
         mapOf(
-            ONCE_STRATEGY to SpecifiedDateChargingStrategies(),
-            REPEATABLE_STRATEGY to DayOfWeekChargingStrategies(),
+            ONCE_STRATEGY to SpecifiedDateChargingStrategies(station = station),
+            REPEATABLE_STRATEGY to DayOfWeekChargingStrategies(station = station),
         ),
     )
 
-    class CompositeChargingStrategiesBuilder {
-        private val specifiedDateChargingStrategies: SpecifiedDateChargingStrategies = SpecifiedDateChargingStrategies()
-        private val dayOfWeekChargingStrategies: DayOfWeekChargingStrategies = DayOfWeekChargingStrategies()
+    class CompositeChargingStrategiesBuilder(
+        station: ChargingStation,
+    ) {
+        private val specifiedDateChargingStrategies: SpecifiedDateChargingStrategies =
+            SpecifiedDateChargingStrategies(station = station)
+        private val dayOfWeekChargingStrategies: DayOfWeekChargingStrategies =
+            DayOfWeekChargingStrategies(station = station)
 
         fun once(chargingStrategy: ChargingStrategy): CompositeChargingStrategiesBuilder {
             this.specifiedDateChargingStrategies.register(strategy = chargingStrategy)
@@ -58,6 +62,6 @@ class CompositeChargingStrategies private constructor(
         private val ONCE_STRATEGY = ChargingStrategy.Cycle.ONCE
         private val REPEATABLE_STRATEGY = ChargingStrategy.Cycle.REPEATABLE
 
-        fun builder(): CompositeChargingStrategiesBuilder = CompositeChargingStrategiesBuilder()
+        fun builder(station: ChargingStation): CompositeChargingStrategiesBuilder = CompositeChargingStrategiesBuilder(station = station)
     }
 }

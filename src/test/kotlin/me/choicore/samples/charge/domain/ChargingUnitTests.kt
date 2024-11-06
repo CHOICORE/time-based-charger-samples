@@ -60,6 +60,7 @@ class ChargingUnitTests {
         // when
         chargingUnit.adjust(
             ChargingStrategy(
+                stationId = 1L,
                 mode = DISCHARGE,
                 rate = 10,
                 timeline =
@@ -113,6 +114,7 @@ class ChargingUnitTests {
 
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = SURCHARGE,
                 rate = 10,
                 timeline =
@@ -148,6 +150,7 @@ class ChargingUnitTests {
 
         val chargingStrategy =
             ChargingStrategy(
+                stationId = 1L,
                 mode = SURCHARGE,
                 rate = 10,
                 timeline =
